@@ -1,2 +1,2 @@
-gcc -nostdlib -I. -c syscalls.c
+gcc -nostdinc -I. -c syscalls.c
 ar rs libth.a syscalls.o
