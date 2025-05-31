@@ -1,23 +1,5 @@
 
-int _syscall(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, int syscall_number);
-
-int sys_write(int fd, char* buf, long len) {
-  return _syscall((void*) (long) fd, buf, (void*) len, 0, 0, 0, 64);
-}
-
-int sys_nanosleep(long sec, long nsec) {
-  struct kernel_timespec {
-    long sec;
-    long nsec;
-  };
-
-  struct kernel_timespec spec = {
-    .sec = sec,
-    .nsec = nsec,
-  };
-
-  return _syscall(&spec, 0, 0, 0, 0, 0, 101);
-}
+#include <syscalls.h>
 
 long strlen(char* str) {
   long len = 0;
