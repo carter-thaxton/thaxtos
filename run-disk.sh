@@ -1,0 +1,13 @@
+qemu-system-aarch64 \
+  -machine virt \
+  -cpu cortex-a72 \
+  -m 512m \
+  -bios ./boot/QEMU_EFI.fd \
+  -kernel ./boot/vmlinux \
+  -append "root=/dev/vda quiet" \
+  -drive file=myos.img,format=raw,if=none,id=hd \
+  -device virtio-blk-pci,drive=hd \
+  -serial stdio \
+  -boot menu=off \
+  -nographic \
+  -nodefaults

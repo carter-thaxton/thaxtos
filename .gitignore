@@ -1,0 +1,4 @@
+mnt/
+root/
+boot/vmlinux
+*.img

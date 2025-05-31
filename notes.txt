@@ -1,0 +1,16 @@
+qemu-img create myos.img 1G
+/sbin/mkfs.ext4 myos.img
+mkdir mnt
+sudo mount ./myos.img ./mnt -t ext4 -o loop
+
+# create filesystem
+cd ./mnt
+sudo mkdir -pv ./{bin,sbin,etc,lib,lib64,var,dev,proc,sys,run,tmp}
+sudo mknod -m 600 ./dev/console c 5 1
+sudo mknod -m 666 ./dev/null c 1 3
+sudo umount ./mnt
+
+# copied kernel from lfs project, and EFI from qemu
+mkdir boot
+cp /mnt/lfs/boot/vmlinux-6.13.7-lfs-debug ./boot/vmlinux
+cp /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ./boot/QEMU_EFI.fd
