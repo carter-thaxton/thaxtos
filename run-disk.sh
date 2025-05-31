@@ -5,7 +5,7 @@ qemu-system-aarch64 \
   -bios ./boot/QEMU_EFI.fd \
   -kernel ./boot/vmlinux \
   -append "root=/dev/vda quiet" \
-  -drive file=myos.img,format=raw,if=none,id=hd \
+  -drive file=disk.img,format=raw,if=none,id=hd \
   -device virtio-blk-pci,drive=hd \
   -serial stdio \
   -boot menu=off \

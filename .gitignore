@@ -2,3 +2,4 @@ mnt/
 root/
 boot/vmlinux
 *.img
+*.o
