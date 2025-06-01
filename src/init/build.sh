@@ -1,2 +1,3 @@
 gcc -nostdinc -nostdlib -I../libth -c init.c
-gcc -nostdlib -ffreestanding -no-pie -L../libth -I../libth init.o ../libth/start.o -lth -o init
+gcc -nostdlib -ffreestanding -no-pie -o init -I../libth init.o ../libth/start.o ../libth/libth.a
+# gcc -nostdlib -ffreestanding -no-pie -o init -I../libth init.o ../libth/start.o -L../libth -lth
