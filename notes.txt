@@ -1,16 +1,25 @@
-qemu-img create myos.img 1G
-/sbin/mkfs.ext4 myos.img
+qemu-img create disk.img 1G
+/sbin/mkfs.ext4 disk.img
+mkdir root
 mkdir mnt
-sudo mount ./myos.img ./mnt -t ext4 -o loop
 
-# create filesystem
-cd ./mnt
-sudo mkdir -pv ./{bin,sbin,etc,lib,lib64,var,dev,proc,sys,run,tmp}
+# create root filesystem
+cd ./root
+sudo mkdir -pv ./{bin,sbin,etc,lib,var,dev,proc,sys,run,tmp}
 sudo mknod -m 600 ./dev/console c 5 1
 sudo mknod -m 666 ./dev/null c 1 3
+
+# copied /lib/ld-linux-aarch64.so.1 from debian
+sudo cp /lib/ld-linux-aarch64.so.1 ./lib/
+cd ..
+
+# copy root filesystem to disk
+sudo mount ./disk.img ./mnt -t ext4 -o loop
+sudo cp -r ./root/* ./mnt/
 sudo umount ./mnt
 
 # copied kernel from lfs project, and EFI from qemu
+# (for now, these are only used by qemu, and aren't on the disk)
 mkdir boot
 cp /mnt/lfs/boot/vmlinux-6.13.7-lfs-debug ./boot/vmlinux
 cp /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ./boot/QEMU_EFI.fd

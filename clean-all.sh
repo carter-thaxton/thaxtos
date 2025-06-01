@@ -1,1 +1,1 @@
-rm -f src/**/*.o
+rm -f src/**/*.o src/**/*.so

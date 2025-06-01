@@ -3,4 +3,4 @@ root/
 boot/vmlinux
 *.img
 *.o
-*.a
+*.so
