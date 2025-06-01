@@ -1,16 +1,8 @@
 
 #include <syscalls.h>
+#include <string.h>
 
-long strlen(char* str) {
-  long len = 0;
-  while (*str) {
-    len++;
-    str++;
-  }
-  return len;
-}
-
-int print(char *msg) {
+int print(const char *msg) {
   long len = strlen(msg);
   return sys_write(1, msg, len);
 }
@@ -35,6 +27,15 @@ int sleep_s(int sec) {
   return sys_nanosleep(sec, 0);
 }
 
+void handle_command(const char* cmd) {
+  if (strcmp(cmd, "none") == 0) {
+    return;
+  }
+  print("Executing: ");
+  print(cmd);
+  print("\n");
+}
+
 int main() {
   print("Welcome to Thaxtos!\n");
 
@@ -46,9 +47,24 @@ int main() {
   print_int(sizeof(long));
   print("\n");
 
+  char buf[1024];
   while (1) {
-    sleep_ms(500);
-    print("TICK\n");
+    print("> ");
+    isize len = sys_read(0, buf, sizeof(buf));
+    if (len < 0) {
+      print("\nERROR: ");
+      print_int(-len);
+      print("\n");
+    } else {
+      if (len > 0 && buf[len-1] == '\n') {
+        if (len > 1) {
+          buf[len-1] = 0;
+          handle_command(buf);
+        }
+      } else {
+        print("\n");
+      }
+    }
   }
 
   return 69;

@@ -1,2 +1,4 @@
+as syscall.s -o syscall.o
 gcc -nostdinc -I. -c syscalls.c
-ar rs libth.a syscalls.o
+gcc -nostdinc -I. -c string.c
+ar rs libth.a syscall.o syscalls.o string.o
