@@ -29,11 +29,18 @@ int sleep_s(int sec) {
 
 void handle_command(const char* cmd) {
   if (strcmp(cmd, "none") == 0) {
-    return;
+    // ignore
+  } else if (strcmp(cmd, "reboot") == 0) {
+    sys_reboot(REBOOT_CMD_RESTART);
+  } else if (strcmp(cmd, "halt") == 0) {
+    sys_reboot(REBOOT_CMD_HALT);
+  } else if (strcmp(cmd, "poweroff") == 0) {
+    sys_reboot(REBOOT_CMD_POWEROFF);
+  } else {
+    print("Executing: ");
+    print(cmd);
+    print("\n");
   }
-  print("Executing: ");
-  print(cmd);
-  print("\n");
 }
 
 int main() {
