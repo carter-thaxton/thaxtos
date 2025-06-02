@@ -1,1 +1,1 @@
-rm -f src/**/*.o src/**/*.a src/**/*.so
+./make-all.sh clean
