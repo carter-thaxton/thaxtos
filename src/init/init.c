@@ -3,7 +3,7 @@
 #include <string.h>
 
 int print(const char *msg) {
-  long len = strlen(msg);
+  usize len = strlen(msg);
   return sys_write(1, msg, len);
 }
 
@@ -36,6 +36,8 @@ void handle_command(const char* cmd) {
     sys_reboot(REBOOT_CMD_HALT);
   } else if (strcmp(cmd, "poweroff") == 0) {
     sys_reboot(REBOOT_CMD_POWEROFF);
+  } else if (strcmp(cmd, "exit") == 0) {
+    sys_exit(0);
   } else {
     print("Executing: ");
     print(cmd);
@@ -43,16 +45,38 @@ void handle_command(const char* cmd) {
   }
 }
 
+#define PRINT_SIZE(type) \
+  do { \
+    print("sizeof " #type ": "); \
+    print_int(sizeof(type)); \
+    print("\n"); \
+  } while(0);
+
+void print_sizes() {
+  PRINT_SIZE(char);
+  PRINT_SIZE(short);
+  PRINT_SIZE(int);
+  PRINT_SIZE(long);
+  PRINT_SIZE(float);
+  PRINT_SIZE(double);
+
+  PRINT_SIZE(u8);
+  PRINT_SIZE(u16);
+  PRINT_SIZE(u32);
+  PRINT_SIZE(u64);
+
+  PRINT_SIZE(i8);
+  PRINT_SIZE(i16);
+  PRINT_SIZE(i32);
+  PRINT_SIZE(i64);
+
+  PRINT_SIZE(f32);
+  PRINT_SIZE(f64);
+}
+
 int main() {
   print("Welcome to Thaxtos!\n");
-
-  print("sizeof int: ");
-  print_int(sizeof(int));
-  print("\n");
-
-  print("sizeof long: ");
-  print_int(sizeof(long));
-  print("\n");
+  print_sizes();
 
   char buf[1024];
   while (1) {

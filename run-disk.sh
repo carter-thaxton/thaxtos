@@ -7,7 +7,7 @@ qemu-system-aarch64 \
   -append "root=/dev/vda quiet" \
   -drive file=disk.img,format=raw,if=none,id=hd \
   -device virtio-blk-pci,drive=hd \
-  -serial stdio \
+  -serial mon:stdio \
   -boot menu=off \
   -nographic \
   -nodefaults
