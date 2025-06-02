@@ -1,5 +1,12 @@
 #pragma once
 
+#define NULL (0)
+#define null (0)
+#define false (0)
+#define FALSE (0)
+#define true (1)
+#define TRUE (1)
+
 typedef char i8;
 
 typedef unsigned char u8;
@@ -27,10 +34,6 @@ typedef unsigned long uint64;
 typedef unsigned long usize;
 
 typedef int bool;
-#define false (0)
-#define FALSE (0)
-#define true (1)
-#define TRUE (1)
 
 typedef float f32;
 

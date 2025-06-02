@@ -1,10 +1,6 @@
 
 #include <syscalls.h>
 
-void sys_exit(int status) {
-  _syscall((void*) (i64) status, 0, 0, 0, 0, 0, 93);
-}
-
 int sys_nanosleep(u64 sec, u64 nsec) {
   struct kernel_timespec {
     u64 sec;
@@ -31,7 +27,16 @@ int sys_reboot(uint cmd) {
   return _syscall((void*) 0xfee1dead, (void*) 0x28121969, (void*) (u64) cmd, 0, 0, 0, 142);
 }
 
+void sys_exit(int status) {
+  _syscall((void*) (i64) status, 0, 0, 0, 0, 0, 93);
+}
+
+int sys_kill(int pid, int sig) {
+  return _syscall((void*) (i64) pid, (void*) (i64) sig, 0, 0, 0, 0, 129);
+}
+
 int sys_fork() {
+  // actually clone syscall, with flags to emulate fork()
   return _syscall((void*) 0x11 /* SIGCHLD */, 0, 0, 0, 0, 0, 220);
 }
 
@@ -67,6 +72,6 @@ int sys_sysinfo(sysinfo_t* info) {
   return _syscall(info, 0, 0, 0, 0, 0, 179);
 }
 
-int sys_waitid(int which, int pid, siginfo_t* info, int options, void* rusage) {
-  return _syscall((void*) (u64) which, (void*) (u64) pid, info, (void*) (u64) options, rusage, 0, 95);
+int sys_waitid(uint id_type, i32 id, siginfo_t* info, uint options) {
+  return _syscall((void*) (u64) id_type, (void*) (u64) id, info, (void*) (u64) options, NULL /* rusage_t */, 0, 95);
 }

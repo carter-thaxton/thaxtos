@@ -54,6 +54,12 @@ void handle_command(const char* cmd) {
     sys_reboot(REBOOT_CMD_POWEROFF);
   } else if (strcmp(cmd, "exit") == 0) {
     sys_exit(69);
+  } else if (strcmp(cmd, "kill") == 0) {
+    int pid = sys_getpid();
+    int sig = 9;
+    print("Kill self\n");
+    int result = sys_kill(pid, sig);
+    print("Should not get here\n");
   } else if (strcmp(cmd, "fork") == 0) {
     int pid = sys_fork();
     if (pid == 0) {
@@ -66,7 +72,7 @@ void handle_command(const char* cmd) {
       print_int(pid);
       print("\n");
       siginfo_t info;
-      int result = sys_waitid(P_PID, pid, &info, WEXITED, 0);
+      int result = sys_waitid(P_PID, pid, &info, WEXITED);
       print("waitid returned: ");
       print_int(result);
       if (result == 0) {
