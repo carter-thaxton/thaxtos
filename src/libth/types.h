@@ -27,6 +27,10 @@ typedef unsigned long uint64;
 typedef unsigned long usize;
 
 typedef int bool;
+#define false (0)
+#define FALSE (0)
+#define true (1)
+#define TRUE (1)
 
 typedef float f32;
 
