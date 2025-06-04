@@ -1,6 +1,7 @@
 
 #include <syscalls.h>
 #include <string.h>
+#include <util.h>
 
 int print(const char *msg) {
   usize len = strlen(msg);
@@ -155,33 +156,27 @@ void handle_command(const char* cmd) {
   }
 }
 
-#define PRINT_SIZE(type) \
-  do { \
-    print("sizeof " #type ": "); \
-    print_int(sizeof(type)); \
-    print("\n"); \
-  } while(0);
-
 void print_sizes() {
-  PRINT_SIZE(char);
-  PRINT_SIZE(short);
-  PRINT_SIZE(int);
-  PRINT_SIZE(long);
-  PRINT_SIZE(float);
-  PRINT_SIZE(double);
+  DBG_INT(sizeof(char));
+  DBG_INT(sizeof(char));
+  DBG_INT(sizeof(short));
+  DBG_INT(sizeof(int));
+  DBG_INT(sizeof(long));
+  DBG_INT(sizeof(float));
+  DBG_INT(sizeof(double));
 
-  PRINT_SIZE(u8);
-  PRINT_SIZE(u16);
-  PRINT_SIZE(u32);
-  PRINT_SIZE(u64);
+  DBG_INT(sizeof(u8));
+  DBG_INT(sizeof(u16));
+  DBG_INT(sizeof(u32));
+  DBG_INT(sizeof(u64));
 
-  PRINT_SIZE(i8);
-  PRINT_SIZE(i16);
-  PRINT_SIZE(i32);
-  PRINT_SIZE(i64);
+  DBG_INT(sizeof(i8));
+  DBG_INT(sizeof(i16));
+  DBG_INT(sizeof(i32));
+  DBG_INT(sizeof(i64));
 
-  PRINT_SIZE(f32);
-  PRINT_SIZE(f64);
+  DBG_INT(sizeof(f32));
+  DBG_INT(sizeof(f64));
 }
 
 int main() {
