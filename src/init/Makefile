@@ -1,4 +1,4 @@
-TARGET_EXE=init
+EXE_TARGET=init
 EXE_DEST=/sbin
 
 # LIB=-lth
