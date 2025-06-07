@@ -3,7 +3,8 @@ AR = ar
 LD = ld
 AS = as
 SHELL = bash
-CFLAGS ?= -nostdlib -nostdinc -I../libth
+
+CFLAGS ?= -nostdlib -nostdinc -fno-builtin -I../libth
 EXEFLAGS ?= -nostdlib -ffreestanding -no-pie -L../libth
 SOFLAGS ?= -nostdlib -shared
 ROOT ?= ../../root
