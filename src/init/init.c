@@ -1,8 +1,7 @@
 
 #include <syscalls.h>
 #include <string.h>
-// #include <util.h>
-#include <print.h>
+#include <stdio.h>
 
 int sleep_us(int usec) {
   return sys_nanosleep(usec / 1000000, (usec % 1000000) * 1000);
@@ -121,11 +120,21 @@ void print_sizes() {
   DBG_INT(sizeof(f64));
 }
 
+void test_printf() {
+  printf("Testing %%, sizeof(f32) = %d and more\n", sizeof(f32));
+
+  char tstbuf[34];
+  isize ret = snprintf(tstbuf, sizeof(tstbuf), "Testing write %d, and %d, and %s to string\n", 69, 420, "XXX");
+  printf("Got %d chars\n", ret);
+  tstbuf[sizeof(tstbuf)-1] = 0;
+  printf("String was: %s\n", tstbuf);
+}
+
 int main() {
   printf("Welcome to Thaxtos!\n");
   // print_sizes();
 
-  eprintf("Testing %%, sizeof(f32) = %d and more\n", sizeof(f32));
+  test_printf();
 
   char buf[1024];
   while (1) {
