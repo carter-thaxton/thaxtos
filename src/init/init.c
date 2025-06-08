@@ -30,9 +30,9 @@ void handle_command(const char* cmd) {
   } else if (strcmp(cmd, "kill") == 0) {
     int pid = sys_getpid();
     int sig = 9;
-    print("Kill self\n");
+    printf("Kill self\n");
     int result = sys_kill(pid, sig);
-    print("Should not get here\n");
+    printf("Should not get here\n");
   } else if (strcmp(cmd, "fork") == 0) {
     int pid = sys_fork();
     if (pid == 0) {
@@ -41,90 +41,58 @@ void handle_command(const char* cmd) {
     } else {
       // parent
       // wait for child to exit
-      print("Waiting for child: ");
-      print_int(pid);
-      print("\n");
+      printf("Waiting for child: %d\n", pid);
       siginfo_t info;
       int result = sys_waitid(P_PID, pid, &info, WEXITED);
-      print("waitid returned: ");
-      print_int(result);
+      printf("waitid returned: %d\n", result);
       if (result == 0) {
-        print("\n  pid: ");
-        print_int(info.pid);
-        print("\n  uid: ");
-        print_int(info.uid);
-        print("\n  code: ");
-        print_int(info.code);
-        print("\n  status: ");
-        print_int(info.status);
-        print("\n  signo: ");
-        print_int(info.signo);
-        print("\n  errno: ");
-        print_int(info.errno);
+        printf("  pid: %d\n", info.pid);
+        printf("  uid: %d\n", info.uid);
+        printf("  code: %d\n", info.code);
+        printf("  status: %d\n", info.status);
+        printf("  signo: %d\n", info.signo);
+        printf("  errno: %d\n", info.errno);
       }
-      print("\n");
+      printf("\n");
     }
   } else if (strcmp(cmd, "pid") == 0) {
     int pid = sys_getpid();
-    print_int(pid);
-    print("\n");
+    printf("%d\n", pid);
   } else if (strcmp(cmd, "ppid") == 0) {
     int ppid = sys_getppid();
-    print_int(ppid);
-    print("\n");
+    printf("%d\n", ppid);
   } else if (strcmp(cmd, "uid") == 0) {
     int uid = sys_getuid();
-    print_int(uid);
-    print("\n");
+    printf("%d\n", uid);
   } else if (strcmp(cmd, "euid") == 0) {
-    int uid = sys_geteuid();
-    print_int(uid);
-    print("\n");
+    int euid = sys_geteuid();
+    printf("%d\n", euid);
   } else if (strcmp(cmd, "gid") == 0) {
     int gid = sys_getgid();
-    print_int(gid);
-    print("\n");
+    printf("%d\n", gid);
   } else if (strcmp(cmd, "egid") == 0) {
-    int gid = sys_getegid();
-    print_int(gid);
-    print("\n");
+    int egid = sys_getegid();
+    printf("%d\n", egid);
   } else if (strcmp(cmd, "sysinfo") == 0) {
     sysinfo_t info;
     sys_sysinfo(&info);
-    print("System info");
-    print("\n  Uptime: ");
-    print_int(info.uptime);
-    print("\n  Load (1 min): ");
-    print_int(info.loads[0]);
-    print("\n  Load (5 min): ");
-    print_int(info.loads[1]);
-    print("\n  Load (15 min): ");
-    print_int(info.loads[2]);
-    print("\n  Total RAM: ");
-    print_int(info.totalram);
-    print("\n  Free RAM: ");
-    print_int(info.freeram);
-    print("\n  Shared RAM: ");
-    print_int(info.sharedram);
-    print("\n  Buffer RAM: ");
-    print_int(info.bufferram);
-    print("\n  Total swap: ");
-    print_int(info.totalswap);
-    print("\n  Free swap: ");
-    print_int(info.freeswap);
-    print("\n  Processes: ");
-    print_int(info.procs);
-    print("\n  Total high memory: ");
-    print_int(info.totalhigh);
-    print("\n  Free high memory: ");
-    print_int(info.freehigh);
-    print("\n  Memory unit size: ");
-    print_int(info.mem_unit);
-    print("\n");
+    printf("System info\n");
+    printf("  Uptime: %d\n", info.uptime);
+    printf("  Load (1 min): %d\n", info.loads[0]);
+    printf("  Load (5 min): %d\n", info.loads[1]);
+    printf("  Load (15 min): %d\n", info.loads[2]);
+    printf("  Total RAM: %d\n", info.totalram);
+    printf("  Free RAM: %d\n", info.freeram);
+    printf("  Shared RAM: %d\n", info.sharedram);
+    printf("  Buffer RAM: %d\n", info.bufferram);
+    printf("  Total swap: %d\n", info.totalswap);
+    printf("  Free swap: %d\n", info.freeswap);
+    printf("  Processes: %d\n", info.procs);
+    printf("  Total high memory: %d\n", info.totalhigh);
+    printf("  Free high memory: %d\n", info.freehigh);
+    printf("  Memory unit size: %d\n", info.mem_unit);
   } else {
-    print("Executing: ");
-    print(cmd);
-    print("\n");
+    printf("Executing: %s\n", cmd);
   }
 }
 
@@ -152,20 +120,19 @@ void print_sizes() {
 }
 
 int main() {
-  print("Welcome to Thaxtos!\n");
-  print_sizes();
+  printf("Welcome to Thaxtos!\n");
+  // print_sizes();
+
+  eprintf("Testing %%, sizeof(f32) = %d and more\n", sizeof(f32));
 
   char buf[1024];
   while (1) {
     int pid = sys_getpid();
-    print_int(pid);
-    print("> ");
+    printf("%d> ", pid);
 
     isize len = sys_read(0, buf, sizeof(buf));
     if (len < 0) {
-      print("\nERROR: ");
-      print_int(-len);
-      print("\n");
+      printf("\nERROR: %d\n", -len);
     } else {
       if (len > 0 && buf[len-1] == '\n') {
         if (len > 1) {
@@ -173,7 +140,7 @@ int main() {
           handle_command(buf);
         }
       } else {
-        print("\n");
+        printf("\n");
       }
     }
   }
