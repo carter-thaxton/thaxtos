@@ -14,6 +14,14 @@ int sys_nanosleep(u64 sec, u64 nsec) {
   return _syscall(&spec, 0, 0, 0, 0, 0, 101);
 }
 
+int sys_openat(int dfd, const char* filename, u32 flags, u32 mode) {
+  return _syscall((void*) (u64) dfd, (void*) filename, (void*) (u64) flags, (void*) (u64) mode, 0, 0, 56);
+}
+
+int sys_close(int fd) {
+  return _syscall((void*) (u64) fd, 0, 0, 0, 0, 0, 57);
+}
+
 isize sys_read(int fd, char* buf, usize len) {
   return _syscall((void*) (u64) fd, (void*) buf, (void*) len, 0, 0, 0, 63);
 }

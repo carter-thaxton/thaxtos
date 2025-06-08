@@ -6,6 +6,9 @@ int _syscall(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4, void* a
 
 int sys_nanosleep(uint64 sec, uint64 nsec);
 
+#define AT_FDCWD            (-100)
+int sys_openat(int dfd, const char* filename, u32 flags, u32 mode);
+int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
 isize sys_write(int fd, const char* buf, usize len);
 

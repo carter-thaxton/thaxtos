@@ -2,9 +2,9 @@
 #include <string.h>
 #include <syscalls.h>
 
-#define FILE_WRITE    (1 << 1)
-#define FILE_READ     (1 << 2)
-#define FILE_STRING   (1 << 3)
+#define F_WRITE   (1 << 1)
+#define F_READ    (1 << 2)
+#define F_STRING  (1 << 3)
 
 #undef FILE
 #define FILE struct stdio_file
@@ -17,57 +17,57 @@ struct stdio_file {
   usize offset;
 };
 
-static int stdio_flush(FILE* file) {
-  if ((file->flags & FILE_WRITE) == 0) {
+static int stdio_flush(FILE* f) {
+  if ((f->flags & F_WRITE) == 0) {
     // can't write to file
     return -1;
   }
 
   // if backed by string, then nothing to do
-  if (file->flags & FILE_STRING) {
+  if (f->flags & F_STRING) {
     return 0;
   }
 
-  if (file->offset > 0) {
-    int ret = sys_write(file->fd, file->buf, file->offset);
+  if (f->offset > 0) {
+    int ret = sys_write(f->fd, f->buf, f->offset);
     if (ret < 0) return ret;
-    file->offset = 0;
+    f->offset = 0;
   }
 
   return 0;
 }
 
-static int stdio_putc(FILE* file, char c) {
-  if ((file->flags & FILE_WRITE) == 0) {
+static int stdio_putc(FILE* f, char c) {
+  if ((f->flags & F_WRITE) == 0) {
     // can't write to file
     return -1;
   }
 
-  if (file->offset < file->buf_size) {
-    file->buf[file->offset] = c;
+  if (f->offset < f->buf_size) {
+    f->buf[f->offset] = c;
   }
 
-  file->offset++;
+  f->offset++;
 
   // flush on every character once offset reaches buf_size
-  if (file->offset >= file->buf_size) {
-    return stdio_flush(file);
+  if (f->offset >= f->buf_size) {
+    return stdio_flush(f);
   }
 
   return 0;
 }
 
-static int stdio_print_str(FILE* file, const char* str) {
+static int stdio_print_str(FILE* f, const char* str) {
   char c;
   while (c = *str++) {
-    int ret = stdio_putc(file, c);
+    int ret = stdio_putc(f, c);
     if (ret < 0) return ret;
   }
   return 0;
 }
 
 // TODO: handle various options, e.g. hex
-static int stdio_print_int(FILE* file, i64 val) {
+static int stdio_print_int(FILE* f, i64 val) {
   bool neg = false;
   if (val < 0) {
     neg = true;
@@ -88,10 +88,10 @@ static int stdio_print_int(FILE* file, i64 val) {
     *(--p) = '-';
   }
 
-  return stdio_print_str(file, p);
+  return stdio_print_str(f, p);
 }
 
-static int stdio_format(FILE* file, const char* fmt, va_list args) {
+static int stdio_format(FILE* f, const char* fmt, va_list args) {
   int ret;
   while (1) {
     char c = *fmt++;
@@ -100,23 +100,23 @@ static int stdio_format(FILE* file, const char* fmt, va_list args) {
       // end of string
       return 0;
     case '%':
-      char f = *fmt++;
-      switch (f) {
+      char spec = *fmt++;
+      switch (spec) {
       case '%':
         // literal %
-        ret = stdio_putc(file, '%');
+        ret = stdio_putc(f, '%');
         break;
       case 's':
         // string
-        ret = stdio_print_str(file, va_arg(args, const char*));
+        ret = stdio_print_str(f, va_arg(args, const char*));
         break;
       case 'd':
         // int
-        ret = stdio_print_int(file, va_arg(args, int));
+        ret = stdio_print_int(f, va_arg(args, int));
         break;
       case 'x':
         // pointer - TODO: print as hex
-        ret = stdio_print_int(file, va_arg(args, u64));
+        ret = stdio_print_int(f, va_arg(args, u64));
         break;
       // case 'l':
       // long, handle next char
@@ -127,7 +127,7 @@ static int stdio_format(FILE* file, const char* fmt, va_list args) {
       }
       break;
     default:
-      ret = stdio_putc(file, c);
+      ret = stdio_putc(f, c);
     }
     if (ret < 0) {
       // io error
@@ -163,7 +163,7 @@ int dprintf(int fd, const char* fmt, ...) {
 int vdprintf(int fd, const char* fmt, va_list args) {
   char buf[1024];
   struct stdio_file file = {
-    .flags = FILE_WRITE,
+    .flags = F_WRITE,
     .fd = fd,
     .buf = buf,
     .buf_size = sizeof(buf),
@@ -186,7 +186,7 @@ isize snprintf(char *buf, usize size, const char* fmt, ...) {
 
 isize vsnprintf(char *buf, usize size, const char* fmt, va_list args) {
   struct stdio_file file = {
-    .flags = FILE_WRITE | FILE_STRING,
+    .flags = F_WRITE | F_STRING,
     .fd = -1,
     .buf = buf,
     .buf_size = size,
