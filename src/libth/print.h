@@ -7,7 +7,7 @@
 #define STDOUT  1
 #define STDERR  2
 
-#define DBG_INT(expr) printf("%s = %d\n", #expr, expr)
+#define EOF     (-1)
 
 int printf(const char* fmt, ...);
 int eprintf(const char* fmt, ...);

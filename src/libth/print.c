@@ -178,8 +178,10 @@ isize vsnprintf(char *buf, usize size, const char* fmt, va_list args) {
   isize result = vio_format(stringbuf_putc, &sb, fmt, args);
   if (result < 0) {
     return result;
-  } else if (result < size) {
-    buf[result] = 0; // nul-terminate if it fits
+  }
+
+  if (sb.cur < size) {
+    buf[sb.cur] = 0; // nul-terminate if it fits
   }
 
   return sb.cur;

@@ -96,6 +96,8 @@ void handle_command(const char* cmd) {
   }
 }
 
+#define DBG_INT(expr) printf("%s = %d\n", #expr, expr)
+
 void print_sizes() {
   DBG_INT(sizeof(char));
   DBG_INT(sizeof(char));
