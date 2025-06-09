@@ -160,6 +160,10 @@ int dprintf(int fd, const char* fmt, ...) {
   return result;
 }
 
+int vprintf(const char* fmt, va_list args) {
+  return vdprintf(STDOUT, fmt, args);
+}
+
 int vdprintf(int fd, const char* fmt, va_list args) {
   char buf[1024];
   struct stdio_file file = {

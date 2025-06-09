@@ -19,6 +19,8 @@
 int printf(const char* fmt, ...);
 int eprintf(const char* fmt, ...);
 int dprintf(int fd, const char* fmt, ...);
+
+int vprintf(const char* fmt, va_list args);
 int vdprintf(int fd, const char* fmt, va_list args);
 
 isize snprintf(char* buf, usize size, const char* fmt, ...);
