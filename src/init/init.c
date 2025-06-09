@@ -30,7 +30,7 @@ void handle_command(const char* cmd) {
     int pid = sys_getpid();
     int sig = 9;
     printf("Kill self\n");
-    int result = sys_kill(pid, sig);
+    sys_kill(pid, sig);
     printf("Should not get here\n");
   } else if (strcmp(cmd, "fork") == 0) {
     int pid = sys_fork();

@@ -11,40 +11,40 @@ int sys_nanosleep(u64 sec, u64 nsec) {
     .nsec = nsec,
   };
 
-  return _syscall(&spec, 0, 0, 0, 0, 0, 101);
+  return _syscall((u64) &spec, 0, 0, 0, 0, 0, 101);
 }
 
 int sys_openat(int dfd, const char* filename, u32 flags, u32 mode) {
-  return _syscall((void*) (u64) dfd, (void*) filename, (void*) (u64) flags, (void*) (u64) mode, 0, 0, 56);
+  return _syscall((u64) dfd, (u64) filename, (u64) flags, (u64) mode, 0, 0, 56);
 }
 
 int sys_close(int fd) {
-  return _syscall((void*) (u64) fd, 0, 0, 0, 0, 0, 57);
+  return _syscall((u64) fd, 0, 0, 0, 0, 0, 57);
 }
 
 isize sys_read(int fd, char* buf, usize len) {
-  return _syscall((void*) (u64) fd, (void*) buf, (void*) len, 0, 0, 0, 63);
+  return _syscall((u64) fd, (u64) buf, len, 0, 0, 0, 63);
 }
 
 isize sys_write(int fd, const char* buf, usize len) {
-  return _syscall((void*) (u64) fd, (void*) buf, (void*) len, 0, 0, 0, 64);
+  return _syscall((u64) fd, (u64) buf, len, 0, 0, 0, 64);
 }
 
 int sys_reboot(uint cmd) {
-  return _syscall((void*) 0xfee1dead, (void*) 0x28121969, (void*) (u64) cmd, 0, 0, 0, 142);
+  return _syscall(0xfee1dead, 0x28121969, (u64) cmd, 0, 0, 0, 142);
 }
 
 void sys_exit(int status) {
-  _syscall((void*) (i64) status, 0, 0, 0, 0, 0, 93);
+  _syscall((i64) status, 0, 0, 0, 0, 0, 93);
 }
 
 int sys_kill(int pid, int sig) {
-  return _syscall((void*) (i64) pid, (void*) (i64) sig, 0, 0, 0, 0, 129);
+  return _syscall((i64) pid, (i64) sig, 0, 0, 0, 0, 129);
 }
 
 int sys_fork() {
   // actually clone syscall, with flags to emulate fork()
-  return _syscall((void*) 0x11 /* SIGCHLD */, 0, 0, 0, 0, 0, 220);
+  return _syscall(0x11 /* SIGCHLD */, 0, 0, 0, 0, 0, 220);
 }
 
 int sys_getpid() {
@@ -76,9 +76,9 @@ int sys_gettid() {
 }
 
 int sys_sysinfo(sysinfo_t* info) {
-  return _syscall(info, 0, 0, 0, 0, 0, 179);
+  return _syscall((u64) info, 0, 0, 0, 0, 0, 179);
 }
 
 int sys_waitid(uint id_type, i32 id, siginfo_t* info, uint options) {
-  return _syscall((void*) (u64) id_type, (void*) (u64) id, info, (void*) (u64) options, NULL /* rusage_t */, 0, 95);
+  return _syscall((u64) id_type, (u64) id, (u64) info, (u64) options, NULL /* rusage_t */, 0, 95);
 }

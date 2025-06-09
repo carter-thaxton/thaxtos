@@ -59,7 +59,7 @@ static int stdio_putc(FILE* f, char c) {
 
 static int stdio_print_str(FILE* f, const char* str) {
   char c;
-  while (c = *str++) {
+  while ((c = *str++)) {
     int ret = stdio_putc(f, c);
     if (ret < 0) return ret;
   }
@@ -71,7 +71,7 @@ static int stdio_print_int(FILE* f, i64 val) {
   bool neg = false;
   if (val < 0) {
     neg = true;
-    val == -val;
+    val = -val;
   }
 
   char buf[32];  // max length of 64-bit integer, and then some
