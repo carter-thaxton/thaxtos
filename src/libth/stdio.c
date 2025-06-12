@@ -4,7 +4,6 @@
 
 #define F_WRITE   (1 << 1)
 #define F_READ    (1 << 2)
-#define F_STRING  (1 << 3)
 
 #undef FILE
 #define FILE struct stdio_file
@@ -24,7 +23,7 @@ static int stdio_flush(FILE* f) {
   }
 
   // if backed by string, then nothing to do
-  if (f->flags & F_STRING) {
+  if (f->fd < 0) {
     return 0;
   }
 
@@ -166,7 +165,7 @@ int vprintf(const char* fmt, va_list args) {
 
 int vdprintf(int fd, const char* fmt, va_list args) {
   char buf[1024];
-  struct stdio_file file = {
+  FILE file = {
     .flags = F_WRITE,
     .fd = fd,
     .buf = buf,
@@ -189,8 +188,8 @@ isize snprintf(char *buf, usize size, const char* fmt, ...) {
 }
 
 isize vsnprintf(char *buf, usize size, const char* fmt, va_list args) {
-  struct stdio_file file = {
-    .flags = F_WRITE | F_STRING,
+  FILE file = {
+    .flags = F_WRITE,
     .fd = -1,
     .buf = buf,
     .buf_size = size,
