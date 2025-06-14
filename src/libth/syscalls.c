@@ -47,6 +47,10 @@ int sys_fork() {
   return _syscall(0x11 /* SIGCHLD */, 0, 0, 0, 0, 0, 220);
 }
 
+uintptr sys_brk(uintptr newbrk) {
+  return _syscall(newbrk, 0, 0, 0, 0, 0, 214);
+}
+
 int sys_getpid() {
   return _syscall(0, 0, 0, 0, 0, 0, 172);
 }

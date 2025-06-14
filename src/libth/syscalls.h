@@ -20,6 +20,7 @@ int sys_reboot(uint cmd);
 void sys_exit(int status);
 int sys_kill(int pid, int sig);
 int sys_fork();  // internally uses clone syscall
+uintptr sys_brk(uintptr newbrk);
 
 int sys_getpid();
 int sys_getppid();
