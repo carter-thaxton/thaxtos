@@ -74,7 +74,7 @@ static int stdio_print_int(FILE* f, i64 val) {
   }
 
   char buf[32];  // max length of 64-bit integer, and then some
-  char *p = &buf[sizeof(buf)-1];
+  char* p = &buf[sizeof(buf)-1];
   *(--p) = 0;
 
   do {
@@ -86,6 +86,24 @@ static int stdio_print_int(FILE* f, i64 val) {
   if (neg) {
     *(--p) = '-';
   }
+
+  return stdio_print_str(f, p);
+}
+
+static int stdio_print_hex(FILE* f, u64 val) {
+  char buf[32];
+  char* p = &buf[sizeof(buf)-1];
+  *(--p) = 0;
+
+  do {
+    int digit = (val % 16);
+    val = val / 16;
+    char c = (digit < 10) ? '0' + digit : 'a' + digit - 10;
+    *(--p) = c;
+  } while (val > 0);
+
+  *(--p) = 'x';
+  *(--p) = '0';
 
   return stdio_print_str(f, p);
 }
@@ -111,11 +129,12 @@ static int stdio_format(FILE* f, const char* fmt, va_list args) {
         break;
       case 'd':
         // int
-        ret = stdio_print_int(f, va_arg(args, int));
+        ret = stdio_print_int(f, va_arg(args, i64));
         break;
       case 'x':
-        // pointer - TODO: print as hex
-        ret = stdio_print_int(f, va_arg(args, u64));
+      case 'p':
+        // hex
+        ret = stdio_print_hex(f, va_arg(args, u64));
         break;
       // case 'l':
       // long, handle next char

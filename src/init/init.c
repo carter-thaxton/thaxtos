@@ -2,6 +2,7 @@
 #include <syscalls.h>
 #include <string.h>
 #include <stdio.h>
+#include <malloc.h>
 
 int sleep_us(int usec) {
   return sys_nanosleep(usec / 1000000, (usec % 1000000) * 1000);
@@ -130,11 +131,25 @@ void test_printf() {
   printf("String was: %s\n", tstbuf);
 }
 
+void test_malloc() {
+  usize sz = 17;
+  char* buf;
+
+  while (sz < 1000000) {
+    buf = malloc(sz);
+    snprintf(buf, sz, "Testing write to buffer of size %d", sz);
+    printf("The string '%s' is at %p\n", buf, buf);
+    free(buf);
+    sz *= 3;
+  }
+}
+
 int main() {
   printf("Welcome to Thaxtos!\n");
   // print_sizes();
 
-  test_printf();
+  // test_printf();
+  test_malloc();
 
   char buf[1024];
   while (1) {

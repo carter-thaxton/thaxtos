@@ -33,6 +33,7 @@ typedef char i8;
 
 typedef unsigned char u8;
 typedef unsigned char uchar;
+typedef unsigned char bool;
 
 typedef short i16;
 typedef short int16;
@@ -57,8 +58,6 @@ typedef unsigned long u64;
 typedef unsigned long uint64;
 typedef unsigned long usize;
 typedef unsigned long uintptr;
-
-typedef int bool;
 
 typedef float f32;
 
