@@ -23,7 +23,7 @@ void handle_command(const char* cmd) {
     sys_reboot(REBOOT_CMD_RESTART);
   } else if (strcmp(cmd, "halt") == 0) {
     sys_reboot(REBOOT_CMD_HALT);
-  } else if (strcmp(cmd, "poweroff") == 0) {
+  } else if (strcmp(cmd, "poweroff") == 0 || strcmp(cmd, "q") == 0) {
     sys_reboot(REBOOT_CMD_POWEROFF);
   } else if (strcmp(cmd, "exit") == 0) {
     sys_exit(69);

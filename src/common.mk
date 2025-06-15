@@ -4,7 +4,7 @@ LD = ld
 AS = as
 SHELL = bash
 
-CFLAGS ?= -nostdlib -nostdinc -fno-builtin -mno-outline-atomics -Wall -Werror -I../libth
+CFLAGS ?= -nostdlib -nostdinc -fno-builtin -mno-outline-atomics -O2 -Wall -Werror -I../libth
 EXEFLAGS ?= -nostdlib -ffreestanding -no-pie -L../libth
 SOFLAGS ?= -nostdlib -shared
 
