@@ -7,6 +7,9 @@ int _syscall(u64 arg0, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, int sys
 int sys_nanosleep(u64 sec, u64 nsec);
 
 #define AT_FDCWD            (-100)
+#define AT_EMPTY_PATH       0x1000
+#define AT_SYMLINK_NOFOLLOW 0x100
+int sys_execveat(int dirfd, const char* pathname, const char* const argv[], const char* const envp[], int flags);
 int sys_openat(int dfd, const char* filename, u32 flags, u32 mode);
 int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
@@ -17,10 +20,11 @@ isize sys_write(int fd, const char* buf, usize len);
 #define REBOOT_CMD_POWEROFF (0x4321fedc)
 int sys_reboot(uint cmd);
 
+uintptr sys_brk(uintptr newbrk);
+
 void sys_exit(int status);
 int sys_kill(int pid, int sig);
 int sys_fork();  // internally uses clone syscall
-uintptr sys_brk(uintptr newbrk);
 
 int sys_getpid();
 int sys_getppid();

@@ -14,6 +14,10 @@ int sys_nanosleep(u64 sec, u64 nsec) {
   return _syscall((u64) &spec, 0, 0, 0, 0, 0, 101);
 }
 
+int sys_execveat(int dirfd, const char* pathname, const char* const argv[], const char* const envp[], int flags) {
+  return _syscall((i64) dirfd, (u64) pathname, (u64) argv, (u64) envp, (i64) flags, 0, 281);
+}
+
 int sys_openat(int dfd, const char* filename, u32 flags, u32 mode) {
   return _syscall((u64) dfd, (u64) filename, (u64) flags, (u64) mode, 0, 0, 56);
 }
@@ -34,6 +38,10 @@ int sys_reboot(uint cmd) {
   return _syscall(0xfee1dead, 0x28121969, (u64) cmd, 0, 0, 0, 142);
 }
 
+uintptr sys_brk(uintptr newbrk) {
+  return _syscall(newbrk, 0, 0, 0, 0, 0, 214);
+}
+
 void sys_exit(int status) {
   _syscall((i64) status, 0, 0, 0, 0, 0, 93);
 }
@@ -45,10 +53,6 @@ int sys_kill(int pid, int sig) {
 int sys_fork() {
   // actually clone syscall, with flags to emulate fork()
   return _syscall(0x11 /* SIGCHLD */, 0, 0, 0, 0, 0, 220);
-}
-
-uintptr sys_brk(uintptr newbrk) {
-  return _syscall(newbrk, 0, 0, 0, 0, 0, 214);
 }
 
 int sys_getpid() {

@@ -1,5 +1,7 @@
 #include <string.h>
 
+const char* base_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 usize strlen(const char* str) {
   usize len = 0;
   while (*str) {
@@ -31,16 +33,20 @@ char tolower(char c) {
   return c;
 }
 
-isize str_find_char(char c, const char* str) {
-  if (c == 0) return -1;
-  for (isize i=0; str[i]; i++)
+char* strchr(const char* str, char c) {
+  for (isize i=0; str[i]; i++) {
     if (str[i] == c)
-      return i;
-  return -1;
+      return (char*) &str[i];
+  }
+  return NULL;
 }
 
-i64 str_to_int(const char* str) {
-  static char* dec_chars = "0123456789ABCDEF";
+isize strchri(const char* str, char c) {
+  const char* p = strchr(str, c);
+  return p ? str - p : -1;
+}
+
+i64 atoi(const char* str, int base) {
   i64 result = 0;
   bool neg = false;
 
@@ -50,9 +56,10 @@ i64 str_to_int(const char* str) {
   }
 
   while (*str) {
-    isize d = str_find_char(*str, dec_chars);
-    if (d < 0) break;
-    result = result * 10 + d;
+    isize digit = strchri(base_chars, toupper(*str));
+    if (digit < 0) break;
+    if (digit > base) break;
+    result = result * base + digit;
     str++;
   }
 
@@ -63,16 +70,7 @@ i64 str_to_int(const char* str) {
   }
 }
 
-u64 str_to_hex(const char* str) {
-  static char* hex_chars = "0123456789ABCDEF";
-  i64 result = 0;
-
-  while (*str) {
-    isize d = str_find_char(toupper(*str), hex_chars);
-    if (d < 0) break;
-    result = result * 16 + d;
-    str++;
-  }
-
-  return result;
-}
+// TODO: implement itoa
+// char* itoa(i64 val, char* buf, int base) {
+//   return NULL;
+// }

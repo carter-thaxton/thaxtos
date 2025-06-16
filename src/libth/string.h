@@ -8,7 +8,8 @@ int strcmp(const char* a, const char* b);
 char toupper(char c);
 char tolower(char c);
 
-isize str_find_char(char c, const char* str);
+char* strchr(const char* str, char c);
+isize strchri(const char* str, char c);
 
-i64 str_to_int(const char* str);
-u64 str_to_hex(const char* str);
+i64 atoi(const char* str, int base);
+//char* itoa(i64 val, char* buf, int base);  // TODO

@@ -2,7 +2,7 @@
 #include <syscalls.h>
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <exec.h>
 
 int sleep_us(int usec) {
   return sys_nanosleep(usec / 1000000, (usec % 1000000) * 1000);
@@ -41,6 +41,29 @@ void handle_command(const char* cmd) {
     } else {
       // parent
       // wait for child to exit
+      printf("Waiting for child: %d\n", pid);
+      siginfo_t info;
+      int result = sys_waitid(P_PID, pid, &info, WEXITED);
+      printf("waitid returned: %d\n", result);
+      if (result == 0) {
+        printf("  pid: %d\n", info.pid);
+        printf("  uid: %d\n", info.uid);
+        printf("  code: %d\n", info.code);
+        printf("  status: %d\n", info.status);
+        printf("  signo: %d\n", info.signo);
+        printf("  errno: %d\n", info.errno);
+      }
+      printf("\n");
+    }
+  } else if (strcmp(cmd, "test") == 0) {
+    int pid = sys_fork();
+    if (pid == 0) {
+      // child
+      int err = execve("/bin/test", NULL, NULL);
+      // should not get here unless error
+      printf("ERROR: %d\n", err);
+    } else {
+      // parent
       printf("Waiting for child: %d\n", pid);
       siginfo_t info;
       int result = sys_waitid(P_PID, pid, &info, WEXITED);
@@ -96,60 +119,8 @@ void handle_command(const char* cmd) {
   }
 }
 
-#define DBG_INT(expr) printf("%s = %d\n", #expr, expr)
-
-void print_sizes() {
-  DBG_INT(sizeof(char));
-  DBG_INT(sizeof(char));
-  DBG_INT(sizeof(short));
-  DBG_INT(sizeof(int));
-  DBG_INT(sizeof(long));
-  DBG_INT(sizeof(float));
-  DBG_INT(sizeof(double));
-
-  DBG_INT(sizeof(u8));
-  DBG_INT(sizeof(u16));
-  DBG_INT(sizeof(u32));
-  DBG_INT(sizeof(u64));
-
-  DBG_INT(sizeof(i8));
-  DBG_INT(sizeof(i16));
-  DBG_INT(sizeof(i32));
-  DBG_INT(sizeof(i64));
-
-  DBG_INT(sizeof(f32));
-  DBG_INT(sizeof(f64));
-}
-
-void test_printf() {
-  printf("Testing %%, sizeof(f32) = %d and more\n", sizeof(f32));
-
-  char tstbuf[34];
-  isize ret = snprintf(tstbuf, sizeof(tstbuf), "Testing write %d, and %d, and %s to string\n", 69, 420, "XXX");
-  printf("Got %d chars\n", ret);
-  tstbuf[sizeof(tstbuf)-1] = 0;
-  printf("String was: %s\n", tstbuf);
-}
-
-void test_malloc() {
-  usize sz = 17;
-  char* buf;
-
-  while (sz < 1000000) {
-    buf = malloc(sz);
-    snprintf(buf, sz, "Testing write to buffer of size %d", sz);
-    printf("The string '%s' is at %p\n", buf, buf);
-    free(buf);
-    sz *= 3;
-  }
-}
-
 int main() {
-  printf("Welcome to Thaxtos!\n");
-  // print_sizes();
-
-  // test_printf();
-  test_malloc();
+  printf("Welcome to ThaxtOS!\n");
 
   char buf[1024];
   while (1) {
