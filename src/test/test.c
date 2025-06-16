@@ -55,7 +55,22 @@ void test() {
   test_malloc();
 }
 
-int main() {
+int main(int argc, const char* argv[], const char* envp[]) {
+  printf("Got %d args\n", argc);
+  for (int i=0; i < argc; i++) {
+    printf("  %s\n", argv[i]);
+  }
+
+  if (envp && *envp) {
+    printf("Environment variables:\n");
+    while (*envp) {
+      printf("  %s\n", *envp);
+      envp++;
+    }
+  } else {
+    printf("No environment variables\n");
+  }
+
   test();
-  return 0;
+  return 55;
 }

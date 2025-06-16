@@ -59,24 +59,21 @@ void handle_command(const char* cmd) {
     int pid = sys_fork();
     if (pid == 0) {
       // child
-      int err = execve("/bin/test", NULL, NULL);
+      const char* args[] = {"one", "two", NULL};
+      const char* envp[] = {"TEST=69", "TEST2=555", NULL};
+      int err = execve("/bin/test", args, envp);
       // should not get here unless error
-      printf("ERROR: %d\n", err);
+      sys_exit(-err);
     } else {
       // parent
-      printf("Waiting for child: %d\n", pid);
+      printf("[Waiting for child: %d]\n", pid);
       siginfo_t info;
       int result = sys_waitid(P_PID, pid, &info, WEXITED);
-      printf("waitid returned: %d\n", result);
       if (result == 0) {
-        printf("  pid: %d\n", info.pid);
-        printf("  uid: %d\n", info.uid);
-        printf("  code: %d\n", info.code);
-        printf("  status: %d\n", info.status);
-        printf("  signo: %d\n", info.signo);
-        printf("  errno: %d\n", info.errno);
+        printf("[PID %d returned %d]\n", info.pid, info.status);
+      } else {
+        printf("waitid returned: %d\n", result);
       }
-      printf("\n");
     }
   } else if (strcmp(cmd, "pid") == 0) {
     int pid = sys_getpid();
