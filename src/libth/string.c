@@ -1,23 +1,6 @@
 #include <string.h>
 
-const char* base_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-usize strlen(const char* str) {
-  usize len = 0;
-  while (*str) {
-    len++;
-    str++;
-  }
-  return len;
-}
-
-int strcmp(const char* a, const char* b) {
-    while (*a && (*a == *b)) {
-        a++;
-        b++;
-    }
-    return (*a > *b) - (*b > *a);
-}
+static const char* base_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 char toupper(char c) {
   if (c >= 'a' && c <= 'z') {
@@ -31,14 +14,6 @@ char tolower(char c) {
     return (c - 'A') + 'a';
   }
   return c;
-}
-
-char* strchr(const char* str, char c) {
-  for (isize i=0; str[i]; i++) {
-    if (str[i] == c)
-      return (char*) &str[i];
-  }
-  return NULL;
 }
 
 isize strchri(const char* str, char c) {

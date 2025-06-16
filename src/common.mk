@@ -36,11 +36,11 @@ all: $(TARGETS)
 $(EXE_TARGET): $(OBJ)
 	$(CC) $(EXEFLAGS) -o $(EXE_TARGET) $(OBJ) $(LIB)
 
-$(LIB_TARGET).a: $(OBJ)
-	$(AR) rs $(LIB_TARGET).a $(OBJ)
+$(LIB_TARGET).a: $(OBJ) $(EXTRA_OBJ)
+	$(AR) rs $(LIB_TARGET).a $(OBJ) $(EXTRA_OBJ)
 
-$(LIB_TARGET).so: $(OBJ)
-	$(LD) $(SOFLAGS) -o $(LIB_TARGET).so $(OBJ)
+$(LIB_TARGET).so: $(OBJ) $(EXTRA_OBJ)
+	$(LD) $(SOFLAGS) -o $(LIB_TARGET).so $(OBJ) $(EXTRA_OBJ)
 
 install: $(TARGETS)
 ifdef EXE_TARGET

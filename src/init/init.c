@@ -59,7 +59,7 @@ void handle_command(const char* cmd) {
     int pid = sys_fork();
     if (pid == 0) {
       // child
-      const char* args[] = {"one", "two", NULL};
+      const char* args[] = {"/bin/test", "one", "two", NULL};
       const char* envp[] = {"TEST=69", "TEST2=555", NULL};
       int err = execve("/bin/test", args, envp);
       // should not get here unless error
