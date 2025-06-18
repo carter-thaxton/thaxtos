@@ -116,8 +116,16 @@ void handle_command(const char* cmd) {
   }
 }
 
+void mount_procfs() {
+  int err = sys_mount("proc", "/proc", "proc", 0, 0);
+  if (err < 0) {
+    printf("ERROR mounting /proc: %d\n", -err);
+  }
+}
+
 int main() {
   printf("Welcome to ThaxtOS!\n");
+  mount_procfs();
 
   char buf[1024];
   while (1) {

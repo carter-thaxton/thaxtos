@@ -15,9 +15,44 @@ int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
 isize sys_write(int fd, const char* buf, usize len);
 
-#define REBOOT_CMD_HALT     (0xcdef0123)
-#define REBOOT_CMD_RESTART  (0x01234567)
-#define REBOOT_CMD_POWEROFF (0x4321fedc)
+#define MOUNT_RDONLY        (1<<0)  // Mount read-only
+#define MOUNT_NOSUID        (1<<1)  // Ignore suid and sgid bits
+#define MOUNT_NODEV         (1<<2)  // Disallow access to device special files
+#define MOUNT_NOEXEC        (1<<3)  // Disallow program execution
+#define MOUNT_SYNCHRONOUS   (1<<4)  // Writes are synced at once
+#define MOUNT_REMOUNT       (1<<5)  // Alter flags of a mounted FS
+#define MOUNT_MANDLOCK      (1<<6)  // Allow mandatory locks on an FS
+#define MOUNT_DIRSYNC       (1<<7)  // Directory modifications are synchronous
+                        //  (1<<8)  -- deliberately missing
+#define MOUNT_NOSYMFOLLOW   (1<<9)  // Do not follow symlinks
+#define MOUNT_NOATIME       (1<<10) // Do not update access times
+#define MOUNT_NODIRATIME    (1<<11) // Do not update directory access times
+#define MOUNT_BIND          (1<<12)
+#define MOUNT_MOVE          (1<<13)
+#define MOUNT_REC           (1<<14)
+#define MOUNT_SILENT        (1<<15)
+#define MOUNT_POSIXACL      (1<<16) // VFS does not apply the umask
+#define MOUNT_UNBINDABLE    (1<<17) // change to unbindable
+#define MOUNT_PRIVATE       (1<<18) // change to private
+#define MOUNT_SLAVE         (1<<19) // change to slave
+#define MOUNT_SHARED        (1<<20) // change to shared
+#define MOUNT_RELATIME      (1<<21) // Update atime relative to mtime/ctime
+#define MOUNT_KERNMOUNT     (1<<22) // this is a kern_mount call
+#define MOUNT_I_VERSION     (1<<23) // Update inode I_version field
+#define MOUNT_STRICTATIME   (1<<24) // Always perform atime updates
+#define MOUNT_LAZYTIME      (1<<25) // Update the on-disk [acm]times lazily
+int sys_mount(const char* dev_name, const char* dir_name, const char* type, u64 flags, void* data);
+
+#define UMOUNT_FORCE    0x00000001  // Attempt to forcibily umount
+#define UMOUNT_DETACH   0x00000002  // Just detach from the tree
+#define UMOUNT_EXPIRE   0x00000004  // Mark for expiry
+#define UMOUNT_NOFOLLOW 0x00000008  // Don't follow symlink on umount
+#define UMOUNT_UNUSED   0x80000000  // Flag guaranteed to be unused
+int sys_umount(const char* name, u64 flags);
+
+#define REBOOT_CMD_HALT     0xcdef0123
+#define REBOOT_CMD_RESTART  0x01234567
+#define REBOOT_CMD_POWEROFF 0x4321fedc
 int sys_reboot(uint cmd);
 
 uintptr sys_brk(uintptr newbrk);

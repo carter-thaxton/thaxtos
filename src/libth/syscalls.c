@@ -34,6 +34,14 @@ isize sys_write(int fd, const char* buf, usize len) {
   return _syscall((u64) fd, (u64) buf, len, 0, 0, 0, 64);
 }
 
+int sys_mount(const char* dev_name, const char* dir_name, const char* type, u64 flags, void* data) {
+  return _syscall((u64) dev_name, (u64) dir_name, (u64) type, flags, (u64) data, 0, 40);
+}
+
+int sys_umount(const char* name, u64 flags) {
+  return _syscall((u64) name, flags, 0, 0, 0, 0, 39);  // umount2
+}
+
 int sys_reboot(uint cmd) {
   return _syscall(0xfee1dead, 0x28121969, (u64) cmd, 0, 0, 0, 142);
 }
