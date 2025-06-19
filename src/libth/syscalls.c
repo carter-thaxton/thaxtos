@@ -14,8 +14,8 @@ int sys_nanosleep(u64 sec, u64 nsec) {
   return _syscall((u64) &spec, 0, 0, 0, 0, 0, 101);
 }
 
-int sys_execveat(int dfd, const char* pathname, const char* const argv[], const char* const envp[], int flags) {
-  return _syscall((i64) dfd, (u64) pathname, (u64) argv, (u64) envp, (i64) flags, 0, 281);
+int sys_execveat(int dfd, const char* filename, const char* const argv[], const char* const envp[], int flags) {
+  return _syscall((i64) dfd, (u64) filename, (u64) argv, (u64) envp, (i64) flags, 0, 281);
 }
 
 int sys_openat(int dfd, const char* filename, u32 flags, u32 mode) {
@@ -32,6 +32,10 @@ isize sys_read(int fd, char* buf, usize len) {
 
 isize sys_write(int fd, const char* buf, usize len) {
   return _syscall((u64) fd, (u64) buf, len, 0, 0, 0, 64);
+}
+
+int sys_chdir(const char* dirname) {
+  return _syscall((u64) dirname, 0, 0, 0, 0, 0, 49);
 }
 
 isize sys_getdents(int dfd, dirent_t* dirents, uint size) {

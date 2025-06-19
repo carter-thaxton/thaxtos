@@ -29,11 +29,12 @@ int sys_nanosleep(u64 sec, u64 nsec);
 #define O_SYNC      04000000
 #define O_PATH     010000000
 #define O_TMPFILE  020000000
-int sys_execveat(int dfd, const char* pathname, const char* const argv[], const char* const envp[], int flags);
+int sys_execveat(int dfd, const char* filename, const char* const argv[], const char* const envp[], int flags);
 int sys_openat(int dfd, const char* filename, u32 flags, u32 mode);
 int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
 isize sys_write(int fd, const char* buf, usize len);
+int sys_chdir(const char* dirname);
 
 #define DT_UNKNOWN  0
 #define DT_FIFO     1
