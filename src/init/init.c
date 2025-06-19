@@ -111,6 +111,30 @@ void handle_command(const char* cmd) {
     printf("  Total high memory: %d\n", info.totalhigh);
     printf("  Free high memory: %d\n", info.freehigh);
     printf("  Memory unit size: %d\n", info.mem_unit);
+  } else if (strcmp(cmd, "ls") == 0) {
+    int dfd = sys_openat(AT_FDCWD, ".", 0, O_RDONLY | O_DIRECTORY);
+    if (dfd < 0) {
+      printf("Error reading directory: %d\n", -dfd);
+      return;
+    }
+
+    char buf[1024];
+    isize sz = sys_getdents(dfd, (dirent_t*)buf, sizeof(buf));
+    if (sz < 0) {
+      printf("Error reading directory entries: %d\n", -sz);
+      sys_close(dfd);
+      return;
+    }
+
+    printf("--------------- sz=%d ---------------\n", sz);
+    printf("inode\ttype\treclen\tname\n");
+    for (usize pos = 0; pos < sz;) {
+      dirent_t* d = (dirent_t*) (buf + pos);
+      printf("%d\t%d\t%d\t%s\n", d->ino, d->type, d->reclen, d->name);
+      pos += d->reclen;
+    }
+
+    sys_close(dfd);
   } else {
     printf("Executing: %s\n", cmd);
   }

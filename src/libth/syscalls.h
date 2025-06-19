@@ -9,11 +9,49 @@ int sys_nanosleep(u64 sec, u64 nsec);
 #define AT_FDCWD            (-100)
 #define AT_EMPTY_PATH       0x1000
 #define AT_SYMLINK_NOFOLLOW 0x100
-int sys_execveat(int dirfd, const char* pathname, const char* const argv[], const char* const envp[], int flags);
+#define O_ACCMODE   00000003
+#define O_RDONLY    00000000
+#define O_WRONLY    00000001
+#define O_RDWR      00000002
+#define O_CREAT     00000100
+#define O_EXCL      00000200
+#define O_NOCTTY    00000400
+#define O_TRUNC     00001000
+#define O_APPEND    00002000
+#define O_NONBLOCK  00004000
+#define O_DSYNC     00010000
+#define O_DIRECT    00040000
+#define O_LARGEFILE 00100000
+#define O_DIRECTORY 00200000
+#define O_NOFOLLOW  00400000
+#define O_NOATIME   01000000
+#define O_CLOEXEC   02000000
+#define O_SYNC      04000000
+#define O_PATH     010000000
+#define O_TMPFILE  020000000
+int sys_execveat(int dfd, const char* pathname, const char* const argv[], const char* const envp[], int flags);
 int sys_openat(int dfd, const char* filename, u32 flags, u32 mode);
 int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
 isize sys_write(int fd, const char* buf, usize len);
+
+#define DT_UNKNOWN  0
+#define DT_FIFO     1
+#define DT_CHR      2
+#define DT_DIR      4
+#define DT_BLK      6
+#define DT_REG      8
+#define DT_LNK      10
+#define DT_SOCK     12
+#define DT_WHT      14
+typedef struct linux_dirent64 {
+   i64  ino;    // 64-bit inode number
+   i64  off;    // 64-bit offset to next structure
+   u16  reclen; // Size of this dirent
+   u8   type;   // File type
+   char name[]; // Filename (null-terminated)
+} dirent_t;
+isize sys_getdents(int dfd, dirent_t* dirents, uint size);
 
 #define MOUNT_RDONLY        (1<<0)  // Mount read-only
 #define MOUNT_NOSUID        (1<<1)  // Ignore suid and sgid bits
