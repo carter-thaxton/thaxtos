@@ -1,9 +1,6 @@
-qemu-img create disk.img 1G
-/sbin/mkfs.ext4 disk.img
-mkdir root
-mkdir mnt
 
 # create root filesystem
+mkdir root
 cd ./root
 sudo mkdir -pv ./{bin,sbin,etc,lib,var,dev,proc,sys,run,tmp}
 sudo mknod -m 600 ./dev/console c 5 1
@@ -13,13 +10,61 @@ sudo mknod -m 666 ./dev/null c 1 3
 sudo cp /lib/ld-linux-aarch64.so.1 ./lib/
 cd ..
 
-# copy root filesystem to disk
-sudo mount ./disk.img ./mnt -t ext4 -o loop
-sudo cp -r ./root/* ./mnt/
-sudo umount ./mnt
 
-# copied kernel from lfs project, and EFI from qemu
-# (for now, these are only used by qemu, and aren't on the disk)
+# copied kernel from lfs project, EFI firmware from qemu, and initialize empty EFI vars
+# qemu expects raw pflash devices to be 64MB in size, so adjust QEMU_EFI.fd and QEMU_VARS.fd accordingly
 mkdir boot
 cp /mnt/lfs/boot/vmlinux-6.13.7-lfs-debug ./boot/vmlinux
 cp /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ./boot/QEMU_EFI.fd
+truncate -s 64M ./boot/QEMU_EFI.fd
+truncate -s 64M ./boot/QEMU_VARS.fd
+
+
+# desired result
+disk.img is partitioned, with an EFI partition using vfat, and primary partition using ext4
+mount/umount scripts use nbd to mount primary partition at ./mnt and EFI partition at ./mnt/boot
+EFI partition contains just vmlinux at root
+create empty boot/QEMU_VARS.fd of size 64M
+resize boot/QEMU_EFI.fd to 64M
+run-disk.sh script should use pflash drives for QEMU_EFI and QEMU_VARS
+somehow modify the EFI variables to refer to vmlinux as boot option, and change boot order to prefer it
+- one option is to use efibootmgr, but that only runs in actual linux.  so maybe mount that QEMU_VARS.fd with lfs project?
+- maybe learn about efivars format?
+- the linux cmdline needs to be included in the EFI variable, referring to root=/dev/vda2
+- can we do the above from the EFI shell?
+
+
+# create disk.img
+qemu-img create disk.img 1G
+
+sudo modprobe nbd max_part=8
+sudo qemu-nbd -c /dev/nbd1 -f raw disk.img
+
+sudo fdisk /dev/nbd1
+  # use GPT partition table
+  g
+
+  # create efi partition
+  n 1 (accept default start 2048) +64M
+  t uefi
+
+  # create linux partition
+  n 2 (accept default start 133120) (accept default end)
+
+  # write results
+  w
+
+sudo mkfs.vfat /dev/nbd1p1
+sudo mkfs.ext4 /dev/nbd1p2
+
+# initial mount of filesystem
+sudo mount -v /dev/nbd1p2 ./mnt
+sudo mkdir -p ./mnt/boot
+sudo mount -v /dev/nbd1p1 ./mnt/boot
+
+# copy linux kernel to EFI partition
+sudo cp ./boot/vmlinux ./mnt/boot/
+
+sudo umount -v ./mnt/boot
+sudo umount -v ./mnt
+sudo qemu-nbd -d /dev/nbd1

@@ -2,12 +2,12 @@ qemu-system-aarch64 \
   -machine virt \
   -cpu cortex-a72 \
   -m 512m \
-  -bios ./boot/QEMU_EFI.fd \
-  -kernel ./boot/vmlinux \
-  -append "root=/dev/vda quiet" \
-  -drive file=disk.img,format=raw,if=none,id=hd \
+  -drive if=pflash,format=raw,file=boot/QEMU_EFI.fd,readonly=on \
+  -drive if=pflash,format=raw,file=boot/QEMU_VARS.fd \
+  -drive if=none,format=raw,file=disk.img,id=hd \
   -device virtio-blk-pci,drive=hd \
-  -serial mon:stdio \
-  -boot menu=off \
+  -serial stdio \
   -nographic \
   -nodefaults
+
+# TODO: use -serial mon:stdio - for now, useful to quit qemu itself with ctrl-c
