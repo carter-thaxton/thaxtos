@@ -1,6 +1,6 @@
 mnt/
 root/
-boot/vmlinux
+boot/
 *.img
 *.o
 *.a

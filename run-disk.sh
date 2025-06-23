@@ -8,4 +8,5 @@ qemu-system-aarch64 \
   -device virtio-blk-pci,drive=hd \
   -serial mon:stdio \
   -nographic \
-  -nodefaults
+  -nodefaults \
+  $@
