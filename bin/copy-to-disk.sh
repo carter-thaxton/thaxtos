@@ -1,4 +1,4 @@
-./mount-disk.sh
+bin/mount-disk.sh
 sudo cp -r ./root/* ./mnt/
 echo "Copied all files from root to mnt"
-./umount-disk.sh
+bin/umount-disk.sh
