@@ -16,6 +16,10 @@ int sleep_s(int sec) {
   return sys_nanosleep(sec, 0);
 }
 
+void clear_screen() {
+  printf("%c[2J%c[H", 27, 27);
+}
+
 void handle_command(const char* cmd) {
   if (strcmp(cmd, "none") == 0) {
     // ignore
@@ -151,6 +155,8 @@ void handle_command(const char* cmd) {
     }
 
     sys_close(dfd);
+  } else if (strcmp(cmd, "cls") == 0) {
+    clear_screen();
   } else {
     printf("Executing: %s\n", cmd);
   }
@@ -164,6 +170,7 @@ void mount_procfs() {
 }
 
 int main() {
+  clear_screen();
   printf("Welcome to ThaxtOS!\n");
   mount_procfs();
 

@@ -123,6 +123,10 @@ static int stdio_format(FILE* f, const char* fmt, va_list args) {
         // literal %
         ret = stdio_putc(f, '%');
         break;
+      case 'c':
+        // char
+        ret = stdio_putc(f, va_arg(args, int));
+        break;
       case 's':
         // string
         ret = stdio_print_str(f, va_arg(args, const char*));
