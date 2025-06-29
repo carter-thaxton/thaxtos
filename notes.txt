@@ -70,6 +70,40 @@ sudo umount -v ./mnt
 sudo qemu-nbd -d /dev/nbd1
 
 
+
+#
+# for now, use GRUB, which allows more flexible options, e.g linux command-line, or boot to UEFI shell itself
+#
+
+# copy grubaa64.efi from lfs project to ./mnt/boot/EFI/BOOT/BOOTAA64.EFI
+# create ./mnt/boot/EFI/BOOT/grub.cfg
+
+set timeout=1
+menuentry 'ThaxtOS' {
+    set root='(hd0,1)'
+    linux /vmlinux root=/dev/vda2 rw quiet
+}
+menuentry 'ThaxtOS (verbose)' {
+    set root='(hd0,1)'
+    linux /vmlinux root=/dev/vda2 rw
+}
+menuentry 'UEFI Shell' {
+    set root='(hd0,1)'
+    chainloader /shell.efi
+}
+
+
+# download shell.efi application itself from tianocore
+# https://github.com/tianocore/edk2-archive/blob/master/ShellBinPkg/UefiShell/AArch64/Shell.efi
+# move to ./mnt/boot/shell.efi
+
+# set efivar to shorten timeout  (from UEFI shell)
+setvar Timeout =0000
+
+
+#
+# (old approach using pure efivars to set linux command line)
+#
 # set efivars to boot into ThaxtOS
 # from UEFI shell:
 bcfg boot dump -v
@@ -86,3 +120,13 @@ bcfg boot mv 3 0
 setvar Timeout =0000
 bcfg boot dump -v
 # should show ThaxtOS as first entry, including linux cmdline arguments, spaced out as UCS2 (null bytes)
+#
+# (end old approach)
+#
+
+
+#
+# create custom UEFI bootloader (efi_boot)
+#
+sudo apt install gnu-efi    # installs efi dev headers
+
