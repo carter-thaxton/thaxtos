@@ -5,4 +5,5 @@ boot/
 *.o
 *.a
 *.so
+*.d
 *.bak

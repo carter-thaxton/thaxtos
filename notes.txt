@@ -33,6 +33,34 @@ somehow modify the EFI variables to refer to vmlinux as boot option, and change 
 - the linux cmdline needs to be included in the EFI variable, referring to root=/dev/vda2
 - can we do the above from the EFI shell?  yes, we can!  see: help bcfg
 
+# download shell.efi application itself from tianocore
+# https://github.com/tianocore/edk2-archive/blob/master/ShellBinPkg/UefiShell/AArch64/Shell.efi
+# move to ./boot/shell.efi
+
+
+#
+# for now, use GRUB, which allows more flexible options, e.g linux command-line, or boot to UEFI shell itself
+#
+
+# copy ./boot/grubaa64.efi from debian
+sudo cp /boot/efi/EFI/debian/grubaa64.efi ./boot/grubaa64.efi
+
+# create ./boot/grub.cfg
+set timeout=1
+menuentry 'ThaxtOS' {
+    set root='(hd0,1)'
+    linux /vmlinux root=/dev/vda2 rw quiet
+}
+menuentry 'ThaxtOS (verbose)' {
+    set root='(hd0,1)'
+    linux /vmlinux root=/dev/vda2 rw
+}
+menuentry 'UEFI Shell' {
+    set root='(hd0,1)'
+    chainloader /shell.efi
+}
+
+
 
 # create disk.img
 qemu-img create disk.img 1G
@@ -62,40 +90,24 @@ sudo mount -v /dev/nbd1p2 ./mnt
 sudo mkdir -p ./mnt/boot
 sudo mount -v /dev/nbd1p1 ./mnt/boot
 
-# copy linux kernel to EFI partition
+# copy linux kernel and UEFI shell to root of EFI partition
 sudo cp ./boot/vmlinux ./mnt/boot/
+sudo cp ./boot/shell.efi ./mnt/boot/
 
+# copy grub and its config to EFI partition, using special fallback path: /EFI/BOOT/BOOTAA64.EFI
+sudo mkdir -p ./mnt/boot/EFI/BOOT
+sudo cp ./boot/grubaa64.efi ./mnt/boot/EFI/BOOT/BOOTAA64.EFI
+sudo cp ./boot/grub.cfg ./mnt/boot/EFI/BOOT/grub.cfg
+
+# copy prepared OS to filesystem
+sudo cp -r ./root/* ./mnt/
+
+# unmount
 sudo umount -v ./mnt/boot
 sudo umount -v ./mnt
 sudo qemu-nbd -d /dev/nbd1
 
 
-
-#
-# for now, use GRUB, which allows more flexible options, e.g linux command-line, or boot to UEFI shell itself
-#
-
-# copy grubaa64.efi from lfs project to ./mnt/boot/EFI/BOOT/BOOTAA64.EFI
-# create ./mnt/boot/EFI/BOOT/grub.cfg
-
-set timeout=1
-menuentry 'ThaxtOS' {
-    set root='(hd0,1)'
-    linux /vmlinux root=/dev/vda2 rw quiet
-}
-menuentry 'ThaxtOS (verbose)' {
-    set root='(hd0,1)'
-    linux /vmlinux root=/dev/vda2 rw
-}
-menuentry 'UEFI Shell' {
-    set root='(hd0,1)'
-    chainloader /shell.efi
-}
-
-
-# download shell.efi application itself from tianocore
-# https://github.com/tianocore/edk2-archive/blob/master/ShellBinPkg/UefiShell/AArch64/Shell.efi
-# move to ./mnt/boot/shell.efi
 
 # set efivar to shorten timeout  (from UEFI shell)
 setvar Timeout =0000

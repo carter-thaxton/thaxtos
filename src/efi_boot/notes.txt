@@ -1,0 +1,7 @@
+
+# uses clang
+https://krinkinmu.github.io/2020/11/21/EFI-aarch64.html
+
+# consider using this, but looks suspicious.  systemd-boot has stopped using it
+https://github.com/rhboot/gnu-efi
+https://github.com/systemd/systemd/issues/27837
