@@ -6,7 +6,7 @@ qemu-system-aarch64 \
   -drive if=pflash,format=raw,file=boot/QEMU_VARS.fd \
   -drive if=none,format=raw,file=disk.img,id=hd \
   -device virtio-blk-pci,drive=hd \
-  -serial mon:stdio \
+  -serial stdio \
   -nographic \
   -nodefaults \
   $@
