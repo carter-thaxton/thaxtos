@@ -178,6 +178,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable
     if (status == EFI_SUCCESS) {
         CHAR8 command_line[512];
         UINTN command_line_size = sizeof(command_line);
+        command_line[command_line_size-1] = '\0';
         status = cmdlineFile->Read(cmdlineFile, &command_line_size, command_line);
 
         if (status == EFI_SUCCESS) {
@@ -188,6 +189,8 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable
             }
             command_line_16[j] = u'\0';
         }
+
+        cmdlineFile->Close(cmdlineFile);
     }
 
     // create path to kernel
