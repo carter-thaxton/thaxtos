@@ -47,7 +47,7 @@ sudo apt install gnu-efi    # installs efi dev headers  (consider writing these 
 
 # copy efi_boot.efi and cmdline config to EFI partition, using special fallback path: /EFI/BOOT/BOOTAA64.EFI
 sudo cp ./src/efi_boot/efi_boot.efi ./root/boot/EFI/BOOT/BOOTAA64.EFI
-sudo cp ./boot/cmdline ./root/boot/cmdline
+sudo cp ./src/efi_boot/cmdline ./root/boot/cmdline
 
 
 # create disk.img

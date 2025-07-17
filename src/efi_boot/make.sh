@@ -7,6 +7,8 @@ if [ "$1" = "clean" ]; then
 elif [ "$1" = "install" ]; then
   echo "Installing efi_boot AS /EFI/BOOT/BOOTAA64.EFI"
   cp efi_boot.efi ../../root/boot/EFI/BOOT/BOOTAA64.EFI
+  echo "Installing cmdline"
+  cp cmdline ../../root/boot/cmdline
 else
   INCLUDE="-I/usr/include -I/usr/include/aarch64-linux-gnu/"
   CFLAGS="-ffreestanding -MMD -mno-red-zone -std=c17 -target aarch64-unknown-windows -Wall -Werror -pedantic -Wno-pointer-to-int-cast $INCLUDE"
