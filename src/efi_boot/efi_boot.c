@@ -24,7 +24,6 @@ CONST EFI_DEVICE_PATH_PROTOCOL EndDevicePath = {
     }
 };
 
-CONST CHAR16* kernel_path = u"vmlinux";
 CONST CHAR16* cmdline_path = u"cmdline";
 
 
@@ -170,43 +169,60 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable
     if (status != EFI_SUCCESS) return status;
 
     // load cmdline file into buffer
-    CHAR16 command_line_16[1024];
-    command_line_16[0] = u'\0';
+    CHAR16 command_line[1024];
+    command_line[0] = u'\0';
 
     EFI_FILE_PROTOCOL* cmdlineFile;
     status = rootDir->Open(rootDir, &cmdlineFile, (CHAR16*)cmdline_path, EFI_FILE_MODE_READ, 0);
     if (status == EFI_SUCCESS) {
-        CHAR8 command_line[512];
-        UINTN command_line_size = sizeof(command_line);
-        command_line[command_line_size-1] = '\0';
-        status = cmdlineFile->Read(cmdlineFile, &command_line_size, command_line);
+        CHAR8 command_line_8[512];
+        UINTN command_line_8_size = sizeof(command_line_8);
+        command_line_8[command_line_8_size-1] = '\0';
+        status = cmdlineFile->Read(cmdlineFile, &command_line_8_size, command_line_8);
 
         if (status == EFI_SUCCESS) {
             // convert to UTF-16
             UINTN j;
-            for (j=0; command_line[j] != '\0' && command_line[j] != '\n'; j++) {
-                command_line_16[j] = command_line[j];
+            for (j=0; command_line_8[j] != '\0' && command_line_8[j] != '\n'; j++) {
+                command_line[j] = command_line_8[j];
             }
-            command_line_16[j] = u'\0';
+            command_line[j] = u'\0';
         }
 
         cmdlineFile->Close(cmdlineFile);
     }
 
-    // create path to kernel
-    EFI_DEVICE_PATH_PROTOCOL* kernelDevicePath = FileDevicePath(rootDevice, kernel_path);
+    // find first word of command_line, to be used as kernel_path, with rest as args to kernel
+    CHAR16* kernel_path = command_line;
+    CHAR16* args = command_line;
+    while (*args != u'\0' && *args != u' ') {
+        args++;
+    }
+    if (*args == u' ') {
+        *args++ = u'\0';
+    }
 
-    clear_screen();
-    print(u"Launching: ");
-    print_device_path(kernelDevicePath);
-    print(u" ");
-    print(command_line_16);
-    print(u"\r\n");
-    // wait_for_key();
+    if (*kernel_path) {
+        // create device path to kernel
+        EFI_DEVICE_PATH_PROTOCOL* kernelDevicePath = FileDevicePath(rootDevice, kernel_path);
 
-    // Launch kernel, returns on error, or if app exits
-    if (launch_app(kernelDevicePath, command_line_16) != EFI_SUCCESS) {
-        print(u"App failed to launch\r\n\r\n");
+        clear_screen();
+        print(u"Launching: ");
+        // print_device_path(kernelDevicePath);
+        print(kernel_path);
+        print(u" ");
+        print(args);
+        print(u"\r\n");
+        // wait_for_key();
+
+        // Launch kernel, returns on error, or if app exits
+        if (launch_app(kernelDevicePath, args) != EFI_SUCCESS) {
+            print(u"Kernel failed to launch\r\n\r\n");
+        }
+    } else {
+        print(u"Invalid cmdline: ");
+        print(command_line);
+        print(u"\r\n\r\n");
     }
 
     // Wait until keypress
