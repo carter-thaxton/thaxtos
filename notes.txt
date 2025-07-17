@@ -23,15 +23,13 @@ truncate -s 64M ./boot/QEMU_VARS.fd
 # desired result
 disk.img is partitioned, with an EFI partition using vfat, and primary partition using ext4
 mount/umount scripts use nbd to mount primary partition at ./mnt and EFI partition at ./mnt/boot
-EFI partition contains just vmlinux at root
+EFI partition contains just vmlinux at root (and cmdline file to adjust how linux boots)
 create empty boot/QEMU_VARS.fd of size 64M
 resize boot/QEMU_EFI.fd to 64M
 run-disk.sh script should use pflash drives for QEMU_EFI and QEMU_VARS
-somehow modify the EFI variables to refer to vmlinux as boot option, and change boot order to prefer it
-- one option is to use efibootmgr, but that only runs in actual linux.  so maybe mount that QEMU_VARS.fd with lfs project?
-- maybe learn about efivars format?
-- the linux cmdline needs to be included in the EFI variable, referring to root=/dev/vda2
-- can we do the above from the EFI shell?  yes, we can!  see: help bcfg
+use standard UEFI fallback of \EFI\BOOT\BOOTAA64.EFI
+modify EFI variable shorten timeout, but otherwise no other configuration necessary
+can we do the above from the EFI shell?  yes, we can!  see: help bcfg
 
 # download shell.efi application itself from tianocore
 # https://github.com/tianocore/edk2-archive/blob/master/ShellBinPkg/UefiShell/AArch64/Shell.efi
@@ -39,27 +37,17 @@ somehow modify the EFI variables to refer to vmlinux as boot option, and change 
 
 
 #
-# for now, use GRUB, which allows more flexible options, e.g linux command-line, or boot to UEFI shell itself
+# we built our own EFI bootloader!  (efi_boot)
 #
 
-# copy ./boot/grubaa64.efi from debian
-sudo cp /boot/efi/EFI/debian/grubaa64.efi ./boot/grubaa64.efi
+sudo apt install gnu-efi    # installs efi dev headers  (consider writing these from scratch?)
 
-# create ./boot/grub.cfg
-set timeout=1
-menuentry 'ThaxtOS' {
-    set root='(hd0,1)'
-    linux /vmlinux root=/dev/vda2 rw quiet
-}
-menuentry 'ThaxtOS (verbose)' {
-    set root='(hd0,1)'
-    linux /vmlinux root=/dev/vda2 rw
-}
-menuentry 'UEFI Shell' {
-    set root='(hd0,1)'
-    chainloader /shell.efi
-}
+# build efi_boot.efi
+./src/efi_boot/make.sh
 
+# copy efi_boot.efi and cmdline config to EFI partition, using special fallback path: /EFI/BOOT/BOOTAA64.EFI
+sudo cp ./src/efi_boot/efi_boot.efi ./root/boot/EFI/BOOT/BOOTAA64.EFI
+sudo cp ./boot/cmdline ./root/boot/cmdline
 
 
 # create disk.img
@@ -94,11 +82,6 @@ sudo mount -v /dev/nbd1p1 ./mnt/boot
 sudo cp ./boot/vmlinux ./mnt/boot/
 sudo cp ./boot/shell.efi ./mnt/boot/
 
-# copy grub and its config to EFI partition, using special fallback path: /EFI/BOOT/BOOTAA64.EFI
-sudo mkdir -p ./mnt/boot/EFI/BOOT
-sudo cp ./boot/grubaa64.efi ./mnt/boot/EFI/BOOT/BOOTAA64.EFI
-sudo cp ./boot/grub.cfg ./mnt/boot/EFI/BOOT/grub.cfg
-
 # copy prepared OS to filesystem
 sudo cp -r ./root/* ./mnt/
 
@@ -109,8 +92,17 @@ sudo qemu-nbd -d /dev/nbd1
 
 
 
-# set efivar to shorten timeout  (from UEFI shell)
+#
+# optionally run UEFI shell once to shorten timeout
+#
+./bin/run-efi-shell.sh  # uses QEMU_EFI.fs and QEMU_VARS.fd, without disk
+
 setvar Timeout =0000
+
+# initial boot into UEFI shell will modify BootOrder, but we don't want that
+bcfg boot dump -v       # find option for "EFI Internal Shell"
+bcfg boot rm 2
+
 
 
 #
@@ -137,8 +129,24 @@ bcfg boot dump -v
 #
 
 
-#
-# create custom UEFI bootloader (efi_boot)
-#
-sudo apt install gnu-efi    # installs efi dev headers
 
+#
+# (old approach using GRUB)
+#
+# copy ./boot/grubaa64.efi from debian
+sudo cp /boot/efi/EFI/debian/grubaa64.efi ./boot/EFI/BOOT/BOOTAA64.EFI
+
+# create ./boot/EFI/BOOT/grub.cfg
+set timeout=1
+menuentry 'ThaxtOS' {
+    set root='(hd0,1)'
+    linux /vmlinux root=/dev/vda2 rw quiet
+}
+menuentry 'ThaxtOS (verbose)' {
+    set root='(hd0,1)'
+    linux /vmlinux root=/dev/vda2 rw
+}
+menuentry 'UEFI Shell' {
+    set root='(hd0,1)'
+    chainloader /shell.efi
+}
