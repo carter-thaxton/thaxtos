@@ -157,6 +157,22 @@ void handle_command(const char* cmd) {
     sys_close(dfd);
   } else if (strcmp(cmd, "cls") == 0) {
     clear_screen();
+  } else if (strcmp(cmd, "fb") == 0) {
+    int fb = sys_openat(0, "/dev/fb0", 0, O_RDWR);
+    if (fb < 0) {
+      printf("Error opening /dev/fb0: %d\n", -fb);
+      return;
+    }
+
+    // don't even care what's in the buffer - display it!
+    char buf[1024];
+    int err = sys_write(fb, buf, sizeof(buf));
+
+    if (err < 0) {
+      printf("Error writing to /dev/fb0: %d\n", -err);
+    }
+
+    sys_close(fb);
   } else {
     printf("Executing: %s\n", cmd);
   }
