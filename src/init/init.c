@@ -158,14 +158,14 @@ void handle_command(const char* cmd) {
   } else if (strcmp(cmd, "cls") == 0) {
     clear_screen();
   } else if (strcmp(cmd, "fb") == 0) {
-    int fb = sys_openat(0, "/dev/fb0", 0, O_RDWR);
+    int fb = sys_openat(0, "/dev/fb0", O_RDWR, 0);
     if (fb < 0) {
       printf("Error opening /dev/fb0: %d\n", -fb);
       return;
     }
 
     // don't even care what's in the buffer - display it!
-    char buf[256];
+    char buf[4096];
     int err = sys_pwrite64(fb, buf, sizeof(buf), 0);
 
     if (err < 0) {
