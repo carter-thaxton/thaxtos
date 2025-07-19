@@ -165,8 +165,8 @@ void handle_command(const char* cmd) {
     }
 
     // don't even care what's in the buffer - display it!
-    char buf[1024];
-    int err = sys_write(fb, buf, sizeof(buf));
+    char buf[256];
+    int err = sys_pwrite64(fb, buf, sizeof(buf), 0);
 
     if (err < 0) {
       printf("Error writing to /dev/fb0: %d\n", -err);

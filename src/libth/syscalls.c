@@ -34,6 +34,10 @@ isize sys_write(int fd, const char* buf, usize len) {
   return _syscall((u64) fd, (u64) buf, len, 0, 0, 0, 64);
 }
 
+isize sys_pwrite64(int fd, const char* buf, usize len, isize off) {
+  return _syscall((u64) fd, (u64) buf, len, off, 0, 0, 68);
+}
+
 int sys_chdir(const char* dirname) {
   return _syscall((u64) dirname, 0, 0, 0, 0, 0, 49);
 }

@@ -34,6 +34,7 @@ int sys_openat(int dfd, const char* filename, u32 flags, u32 mode);
 int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
 isize sys_write(int fd, const char* buf, usize len);
+isize sys_pwrite64(int fd, const char* buf, usize len, isize off);
 int sys_chdir(const char* dirname);
 
 #define DT_UNKNOWN  0

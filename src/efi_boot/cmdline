@@ -1,1 +1,1 @@
-vmlinux root=/dev/vda2 rw quiet
+vmlinux root=/dev/vda2 rw
