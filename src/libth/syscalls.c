@@ -38,6 +38,10 @@ isize sys_pwrite64(int fd, const char* buf, usize len, isize off) {
   return _syscall((u64) fd, (u64) buf, len, off, 0, 0, 68);
 }
 
+int sys_ioctl(int fd, u64 op, void* arg) {
+  return _syscall((u64) fd, op, (u64)arg, 0, 0, 0, 29);
+}
+
 int sys_chdir(const char* dirname) {
   return _syscall((u64) dirname, 0, 0, 0, 0, 0, 49);
 }
@@ -60,6 +64,10 @@ int sys_reboot(uint cmd) {
 
 uintptr sys_brk(uintptr newbrk) {
   return _syscall(newbrk, 0, 0, 0, 0, 0, 214);
+}
+
+void *sys_mmap(void* addr, usize len, int prot, int flags, int fd, isize off) {
+  return (void*) _syscall((u64) addr, len, (u64) prot, (u64) flags, (u64) fd, off, 222);
 }
 
 void sys_exit(int status) {

@@ -1,3 +1,4 @@
+set -e
 
 DIRS="libth init test"
 

@@ -1,6 +1,6 @@
 
 SRC=../../github/optimized-routines
-OBJ="memcpy memmove memset memchr memrchr memcmp strcpy stpcpy strcmp strchr strrchr strchrnul strlen strnlen strncmp"
+OBJ="memcpy memset memchr memrchr memcmp strcpy stpcpy strcmp strchr strrchr strchrnul strlen strnlen strncmp"
 # TODO: add math routines as they are needed
 
 rm -f *.a *.so

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <exec.h>
+#include <fb.h>
 
 int sleep_us(int usec) {
   return sys_nanosleep(usec / 1000000, (usec % 1000000) * 1000);
@@ -164,15 +165,35 @@ void handle_command(const char* cmd) {
       return;
     }
 
-    // don't even care what's in the buffer - display it!
-    char buf[4096];
-    int err = sys_pwrite64(fb, buf, sizeof(buf), 0);
-
+    fb_var_screeninfo info;
+    int err = sys_ioctl(fb, FBIOGET_VSCREENINFO, &info);
     if (err < 0) {
-      printf("Error writing to /dev/fb0: %d\n", -err);
+      printf("Error getting fb_var_screeninfo from /dev/fb0: %d\n", -err);
+      return;
+    }
+
+    printf("Current resolution: %d x %d\n", info.xres, info.yres);
+    usize len = info.xres * info.yres * sizeof(u32);
+
+    u32* pixbuf = sys_mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
+    if (pixbuf == MAP_FAILED) {
+      printf("Error mapping framebuffer to memory\n");
+      return;
     }
 
     sys_close(fb);
+
+    memset(pixbuf, 0xFF, len);
+
+    // // don't even care what's in the buffer - display it!
+    // char buf[4096];
+    // err = sys_pwrite64(fb, buf, sizeof(buf), 0);
+
+    // if (err < 0) {
+    //   printf("Error writing to /dev/fb0: %d\n", -err);
+    // }
+
+    // sys_close(fb);
   } else {
     printf("Executing: %s\n", cmd);
   }

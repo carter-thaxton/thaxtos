@@ -2,7 +2,7 @@
 
 #include <types.h>
 
-int _syscall(u64 arg0, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, int syscall_number);
+i64 _syscall(u64 arg0, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, int syscall_number);
 
 int sys_nanosleep(u64 sec, u64 nsec);
 
@@ -35,6 +35,7 @@ int sys_close(int fd);
 isize sys_read(int fd, char* buf, usize len);
 isize sys_write(int fd, const char* buf, usize len);
 isize sys_pwrite64(int fd, const char* buf, usize len, isize off);
+int sys_ioctl(int fd, u64 op, void* arg);
 int sys_chdir(const char* dirname);
 
 #define DT_UNKNOWN  0
@@ -47,11 +48,11 @@ int sys_chdir(const char* dirname);
 #define DT_SOCK     12
 #define DT_WHT      14
 typedef struct linux_dirent64 {
-   i64  ino;    // 64-bit inode number
-   i64  off;    // 64-bit offset to next structure
-   u16  reclen; // Size of this dirent
-   u8   type;   // File type
-   char name[]; // Filename (null-terminated)
+  i64  ino;    // 64-bit inode number
+  i64  off;    // 64-bit offset to next structure
+  u16  reclen; // Size of this dirent
+  u8   type;   // File type
+  char name[]; // Filename (null-terminated)
 } dirent_t;
 isize sys_getdents(int dfd, dirent_t* dirents, uint size);
 
@@ -96,6 +97,22 @@ int sys_umount(const char* name, u64 flags);
 int sys_reboot(uint cmd);
 
 uintptr sys_brk(uintptr newbrk);
+
+#define PROT_READ           0x1             // page can be read
+#define PROT_WRITE          0x2             // page can be written
+#define PROT_EXEC           0x4             // page can be executed
+#define PROT_SEM            0x8             // page may be used for atomic ops
+#define PROT_NONE           0x0             // page can not be accessed
+#define PROT_GROWSDOWN      0x01000000      // mprotect flag: extend change to start of growsdown vma
+#define PROT_GROWSUP        0x02000000      // mprotect flag: extend change to end of growsup vma
+#define MAP_SHARED          0x01            // Share changes
+#define MAP_PRIVATE         0x02            // Changes are private
+#define MAP_SHARED_VALIDATE 0x03            // share + validate extension flags
+#define MAP_TYPE            0x0f            // Mask for type of mapping
+#define MAP_FIXED           0x10            // Interpret addr exactly
+#define MAP_ANONYMOUS       0x20            // don't use a file
+#define MAP_FAILED          ((void *) -1)
+void *sys_mmap(void* addr, usize len, int prot, int flags, int fd, isize off);
 
 void sys_exit(int status);
 int sys_kill(int pid, int sig);
