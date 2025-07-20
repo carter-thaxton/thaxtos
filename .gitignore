@@ -1,6 +1,7 @@
 mnt/
 root/
 boot/
+mac
 *.img
 *.o
 *.a

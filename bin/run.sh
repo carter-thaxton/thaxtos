@@ -7,6 +7,6 @@ qemu-system-aarch64 \
   -drive if=none,format=raw,file=disk.img,id=hd \
   -device virtio-blk-pci,drive=hd \
   -serial mon:stdio \
-  -nographic \
   -nodefaults \
+  -nographic \
   $@

@@ -6,10 +6,10 @@ qemu-system-aarch64 \
   -drive if=pflash,format=raw,file=boot/QEMU_VARS.fd \
   -drive if=none,format=raw,file=disk.img,id=hd \
   -device virtio-blk-pci,drive=hd \
-  -serial stdio \
-  -nodefaults \
   -device nec-usb-xhci,id=xhci \
   -device usb-tablet,bus=xhci.0 \
   -device usb-kbd,bus=xhci.0 \
   -device ramfb \
+  -serial mon:stdio \
+  -nodefaults \
   $@
