@@ -176,38 +176,26 @@ void handle_command(const char* cmd) {
     printf("Current resolution: %d x %d\n", info.xres, info.yres);
     usize len = info.xres * info.yres * sizeof(u32);
 
-    static bool use_mmap = FALSE;
-    int delay_ms = 5;
-    if (use_mmap) {
-      printf("Using mmap to write to fb\n");
-      u32* pixbuf = sys_mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
-      if (pixbuf == MAP_FAILED) {
-        printf("Error mapping framebuffer to memory\n");
-        return;
-      }
-      sys_close(fb);
-      for (int c=0; c <= 0xFF; c++) {
-        memset(pixbuf, c, len);
-        sleep_ms(delay_ms);
-      }
-      // munmap?
-    } else {
-      printf("Using pwrite64 to write to fb\n");
-      u32* pixbuf = malloc(len);
-      for (int c=0; c <= 0xFF; c++) {
-        memset(pixbuf, c, len);
-        err = sys_pwrite64(fb, (char*)pixbuf, len, 0);
-        if (err < 0) {
-          printf("Error writing to /dev/fb0: %d\n", -err);
-          break;
-        }
-        sleep_ms(delay_ms);
-      }
-      free(pixbuf);
-      sys_close(fb);
+    static usize s_len = 0;
+    static u32* s_pixbuf = NULL;
+    if (len != s_len) {
+      if (s_pixbuf) free(s_pixbuf);
+      s_pixbuf = malloc(len);
+      s_len = len;
     }
 
-    use_mmap = !use_mmap;
+    int delay_ms = 5;
+    for (int c=0; c <= 0xFF; c++) {
+      memset(s_pixbuf, c, len);
+      err = sys_pwrite64(fb, (char*)s_pixbuf, len, 0);
+      if (err < 0) {
+        printf("Error writing to /dev/fb0: %d\n", -err);
+        break;
+      }
+      sleep_ms(delay_ms);
+    }
+    sys_close(fb);
+
     printf("DONE\n");
   } else {
     printf("Executing: %s\n", cmd);
