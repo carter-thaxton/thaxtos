@@ -170,10 +170,35 @@ void handle_command(const char* cmd) {
     int err = sys_ioctl(fb, FBIOGET_VSCREENINFO, &info);
     if (err < 0) {
       printf("Error getting fb_var_screeninfo from /dev/fb0: %d\n", -err);
+      sys_close(fb);
       return;
     }
 
     printf("Current resolution: %d x %d\n", info.xres, info.yres);
+    u32 new_x = 600;
+    u32 new_y = 600;
+
+    if (info.xres != new_x || info.yres != new_y) {
+      info.xres = info.xres_virtual = new_x;
+      info.yres = info.yres_virtual = new_y;
+
+      err = sys_ioctl(fb, FBIOPUT_VSCREENINFO, &info);
+      if (err < 0) {
+        printf("Error setting fb_var_screeninfo at /dev/fb0: %d\n", -err);
+        sys_close(fb);
+        return;
+      }
+
+      err = sys_ioctl(fb, FBIOGET_VSCREENINFO, &info);
+      if (err < 0) {
+        printf("Error getting fb_var_screeninfo from /dev/fb0: %d\n", -err);
+        sys_close(fb);
+        return;
+      }
+
+      printf("New resolution: %d x %d\n", info.xres, info.yres);
+    }
+
     usize len = info.xres * info.yres * sizeof(u32);
 
     static usize s_len = 0;
