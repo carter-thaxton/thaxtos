@@ -2,6 +2,7 @@
 #include <syscalls.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <malloc.h>
 #include <exec.h>
 #include <fb.h>
@@ -22,7 +23,10 @@ void clear_screen() {
   printf("%c[2J%c[H", 27, 27);
 }
 
-void handle_command(const char* cmd) {
+void handle_command(const char* argv[], int argc) {
+  if (argc < 1) return;
+  const char* cmd = argv[0];
+
   if (strcmp(cmd, "none") == 0) {
     // ignore
   } else if (strcmp(cmd, "reboot") == 0) {
@@ -62,25 +66,10 @@ void handle_command(const char* cmd) {
       printf("\n");
     }
   } else if (strcmp(cmd, "test") == 0) {
-    int pid = sys_fork();
-    if (pid == 0) {
-      // child
-      const char* args[] = {"/bin/test", "one", "two", NULL};
-      const char* envp[] = {"TEST=69", "TEST2=555", NULL};
-      int err = execve("/bin/test", args, envp);
-      // should not get here unless error
-      sys_exit(-err);
-    } else {
-      // parent
-      printf("[Waiting for child: %d]\n", pid);
-      siginfo_t info;
-      int result = sys_waitid(P_PID, pid, &info, WEXITED);
-      if (result == 0) {
-        printf("[PID %d returned %d]\n", info.pid, info.status);
-      } else {
-        printf("waitid returned: %d\n", result);
-      }
-    }
+    const char* args[] = {"/bin/test", "one", "two", NULL};
+    const char* envp[] = {"TEST=69", "TEST2=555", NULL};
+    int err = run_command(args, envp);
+    printf("[test returned %d]\n", err);
   } else if (strcmp(cmd, "pid") == 0) {
     int pid = sys_getpid();
     printf("%d\n", pid);
@@ -175,7 +164,7 @@ void handle_command(const char* cmd) {
     }
 
     printf("Current resolution: %d x %d\n", info.xres, info.yres);
-    u32 new_x = 600;
+    u32 new_x = 800;
     u32 new_y = 600;
 
     if (info.xres != new_x || info.yres != new_y) {
@@ -227,6 +216,38 @@ void handle_command(const char* cmd) {
   }
 }
 
+// split line into words, and forward to handle_command
+// TODO: handle multi-line input, e.g. using \ at end of line
+void handle_command_line(char* line) {
+  const char* argv[256];
+  int argc = 0;
+
+  char* word = line;
+  while (1) {
+    char* c = word;
+    while (*c && isblank(*c)) {
+      c++;
+    }
+    word = c;
+    while (*c && isgraph(*c)) {
+      c++;
+    }
+
+    if (*word) {
+      argv[argc++] = word;
+    }
+
+    if (*c) {
+      *c++ = '\0';
+      word = c;
+    } else {
+      break;
+    }
+  }
+
+  handle_command(argv, argc);
+}
+
 int main() {
   char buf[1024];
 
@@ -239,10 +260,8 @@ int main() {
       printf("\nERROR: %d\n", -len);
     } else {
       if (len > 0 && buf[len-1] == '\n') {
-        if (len > 1) {
-          buf[len-1] = 0;
-          handle_command(buf);
-        }
+        buf[len-1] = 0;
+        handle_command_line(buf);
       } else {
         printf("\n");
       }
