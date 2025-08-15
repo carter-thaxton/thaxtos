@@ -11,7 +11,7 @@ elif [ "$1" = "install" ]; then
   cp cmdline ../../root/boot/cmdline
 else
   INCLUDE="-I/usr/include -I/usr/include/aarch64-linux-gnu/"
-  CFLAGS="-ffreestanding -MMD -mno-red-zone -std=c17 -target aarch64-unknown-windows -Wall -Werror -pedantic -Wno-pointer-to-int-cast $INCLUDE"
+  CFLAGS="-ffreestanding -MMD -mno-red-zone -std=c17 -target aarch64-unknown-windows -Wall -Werror -pedantic -Wno-pointer-to-int-cast -Wno-strict-prototypes $INCLUDE"
   LDFLAGS="-flavor link -subsystem:efi_application -entry:efi_main"
 
   clang $CFLAGS -c efi_boot.c -o efi_boot.o
